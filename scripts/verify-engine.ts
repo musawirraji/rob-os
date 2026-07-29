@@ -250,7 +250,10 @@ async function main(): Promise<void> {
           db,
           extract: async () => fixture,
           embed: async (texts: string[]) => texts.map(() => new Array(1024).fill(0)),
-          summarise: async () => "[verify] summary",
+          // Returns null so updateSummaries skips the write. A stub string here
+          // clobbers the real summaries with "[verify] summary" — the harness must
+          // not leave its fingerprints on the data it is checking.
+          summarise: async () => null,
         },
         ws,
         {

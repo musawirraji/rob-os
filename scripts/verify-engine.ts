@@ -28,10 +28,12 @@ async function main(): Promise<void> {
     { getAdminSupabase },
     { applyReviewDecision, loadReviewScreen },
     { ingestSource, parseFile },
+    { revertAuditEntry, getAuditTrail },
   ] = await Promise.all([
     import("../src/shared/services/supabase/adminClient"),
     import("../src/features/review"),
     import("../src/features/ingestion"),
+    import("../src/shared/services/auditRevert"),
   ]);
 
   const db = getAdminSupabase();
@@ -158,8 +160,29 @@ async function main(): Promise<void> {
     (item) => item.entityKind === "person" && item.headline === "Sarah",
   );
 
-  if (!ambiguous) {
-    check("found the bare-\"Sarah\" review item to correct", false, "not in the queue");
+  // The correction is destructive: once applied, the item is gone. So a second run
+  // has to recognise the already-corrected state rather than reporting a failure —
+  // a suite that only passes on a fresh database gets ignored.
+  const { data: existingHint } = await db
+    .from("resolution_hint")
+    .select("mention, entity_id")
+    .eq("workspace_id", ws)
+    .eq("entity_kind", "person")
+    .eq("mention", "sarah")
+    .maybeSingle();
+
+  if (!ambiguous && existingHint) {
+    check(
+      "the correction loop has already run (hint present, nothing re-queued)",
+      existingHint.entity_id !== null,
+      `sarah → ${existingHint.entity_id?.slice(0, 8)}; re-run after \`npm run seed:ingest -- --fixtures\` to exercise it again`,
+    );
+  } else if (!ambiguous) {
+    check(
+      'found the bare-"Sarah" review item to correct',
+      false,
+      "not in the queue and no hint — reseed with `npm run seed:ingest -- --fixtures`",
+    );
   } else {
     const { data: sarah } = await db
       .from("person")
@@ -293,6 +316,150 @@ async function main(): Promise<void> {
     withPrev.length > 0,
     `${withPrev.length} of ${audit?.length ?? 0} entries`,
   );
+
+  // ── A5. Reversibility ──────────────────────────────────────────────────────
+
+  console.log("\nA5. Reverting an AI write\n");
+
+  const { data: created } = await db
+    .from("audit_log")
+    .select("id, entity_kind, entity_id")
+    .eq("workspace_id", ws)
+    .eq("entity_kind", "company")
+    .eq("action", "create")
+    .limit(1)
+    .maybeSingle();
+
+  if (!created) {
+    check("found a company create to revert", false);
+  } else {
+    // Ingestion enriches a company right after creating it, so the create entry is
+    // already superseded. The staleness guard fires before the foreign-key path is
+    // ever reached — labelled for what it actually proves, not what it looks like.
+    const blocked = await revertAuditEntry(db, ws, created.id);
+    check(
+      "revert refuses a create that has since been updated",
+      !blocked.ok && blocked.stale === true,
+      blocked.message,
+    );
+
+    // The foreign-key refusal, exercised on its own: latest entry, but the row is
+    // referenced. Without this the cascade behaviour is untested.
+    const { data: referenced } = await db
+      .from("company")
+      .insert({ workspace_id: ws, name: "Referenced Co" })
+      .select("id")
+      .single();
+
+    if (referenced) {
+      await db
+        .from("person")
+        .insert({ workspace_id: ws, name: "Dependent Person", company_id: referenced.id });
+
+      const { data: fkAudit } = await db
+        .from("audit_log")
+        .insert({
+          workspace_id: ws,
+          entity_kind: "company",
+          entity_id: referenced.id,
+          action: "create",
+          reason: "verify harness — fk path",
+          new_value: { name: "Referenced Co" } as never,
+        })
+        .select("id")
+        .single();
+
+      const fkBlocked = await revertAuditEntry(db, ws, fkAudit!.id);
+      check(
+        "revert refuses when another row still references it",
+        !fkBlocked.ok && fkBlocked.stale !== true,
+        fkBlocked.message,
+      );
+    }
+
+    // A standalone row with no dependents should revert cleanly.
+    const { data: orphan } = await db
+      .from("company")
+      .insert({ workspace_id: ws, name: "Revert Test Ltd" })
+      .select("id")
+      .single();
+
+    if (!orphan) {
+      check("created a standalone row to revert", false);
+    } else {
+      const { data: auditRow } = await db
+        .from("audit_log")
+        .insert({
+          workspace_id: ws,
+          entity_kind: "company",
+          entity_id: orphan.id,
+          action: "create",
+          reason: "verify harness",
+          new_value: { name: "Revert Test Ltd" } as never,
+        })
+        .select("id")
+        .single();
+
+      const undone = await revertAuditEntry(db, ws, auditRow!.id);
+      check("revert removes a created row with no dependents", undone.ok, undone.message);
+
+      const { count } = await db
+        .from("company")
+        .select("*", { count: "exact", head: true })
+        .eq("id", orphan.id);
+      check("the row is gone", (count ?? 0) === 0, `${count} row(s) remain`);
+
+      const trail = await getAuditTrail(db, ws, "company", orphan.id);
+      check(
+        "the revert is itself audited",
+        trail.some((entry) => entry.action === "delete"),
+        `${trail.length} entr(ies) on the trail`,
+      );
+    }
+
+    // Staleness: an entry that is no longer the latest must not be revertable.
+    const { data: person } = await db
+      .from("person")
+      .select("id, name")
+      .eq("workspace_id", ws)
+      .limit(1)
+      .single();
+
+    if (person) {
+      const { data: older } = await db
+        .from("audit_log")
+        .insert({
+          workspace_id: ws,
+          entity_kind: "person",
+          entity_id: person.id,
+          action: "update",
+          field: "role",
+          reason: "verify harness — older",
+          prev_value: { role: "Old Role" } as never,
+          new_value: { role: "Newer Role" } as never,
+        })
+        .select("id")
+        .single();
+
+      await db.from("audit_log").insert({
+        workspace_id: ws,
+        entity_kind: "person",
+        entity_id: person.id,
+        action: "update",
+        field: "role",
+        reason: "verify harness — newer",
+        prev_value: { role: "Newer Role" } as never,
+        new_value: { role: "Newest Role" } as never,
+      });
+
+      const stale = await revertAuditEntry(db, ws, older!.id);
+      check(
+        "a superseded entry cannot be reverted over a newer change",
+        !stale.ok && stale.stale === true,
+        stale.message,
+      );
+    }
+  }
 
   // ── Provenance, re-checked ─────────────────────────────────────────────────
 

@@ -1,5 +1,5 @@
 import { Icon } from "@shared/components/Icon";
-import { Card, CardHeader, SectionLabel } from "@shared/components/primitives";
+import { Card, CardHeader } from "@shared/components/primitives";
 import { SOURCE_KINDS, type SourceKind } from "@shared/interfaces/objects";
 
 /**
@@ -87,10 +87,12 @@ export function CaptureForms({
                 Upload
               </button>
             </div>
-            <SectionLabel>
+            {/* A sentence, so it gets body treatment — the eyebrow style is for
+                labels, and using it here shouts a caption. */}
+            <p className="ro-capture__note">
               The original is stored before anything is parsed. Images are kept
               pending OCR.
-            </SectionLabel>
+            </p>
           </form>
         </Card>
       </div>

@@ -1,0 +1,108 @@
+// ─────────────────────────────────────────────────────────────────────────────
+// Rob OS — design tokens
+// Single source of truth. Pulled from robos-v2.html / the build brief §5.
+// Auto-injected into every stylesheet via next.config sassOptions.
+// Rule: 95% of the UI is canvas + surface + ink + gray. Colour only appears as
+// small object-tile icons and pastel status badges. Primary actions are black.
+// ─────────────────────────────────────────────────────────────────────────────
+
+// ── Neutral base ─────────────────────────────────────────────────────────────
+$ro-canvas: #f6f7f8;
+$ro-surface: #ffffff;
+$ro-surface-2: #fbfbfc;
+$ro-surface-3: #f1f2f4;
+
+$ro-ink: #17181a; // primary text + every primary action
+$ro-ink-2: #6b6c70; // secondary text
+$ro-muted: #a3a4a7; // labels, timestamps, placeholders
+
+$ro-line: rgba(23, 24, 26, 0.085);
+$ro-line-2: rgba(23, 24, 26, 0.05);
+
+// ── Object tiles — the only real colour, small use only ──────────────────────
+$ro-tile-person: #5b6470; // slate
+$ro-tile-project: #5b64c0; // indigo
+$ro-tile-company: #3a897a; // teal
+$ro-tile-deal: #b1803a; // amber
+$ro-tile-meeting: #b15f70; // rose
+$ro-tile-note: #4a9068; // green
+
+// ── Pastel status ────────────────────────────────────────────────────────────
+$ro-good-bg: #e9f4ee;
+$ro-good-fg: #2f7d54;
+$ro-warn-bg: #f5efe0;
+$ro-warn-fg: #8f5f18;
+$ro-crit-bg: #f8eaec;
+$ro-crit-fg: #b1444f;
+$ro-neut-bg: #eff0f2;
+$ro-neut-fg: #6b6c70;
+
+// ── Provenance — quiet uppercase text tags, never loud chips ─────────────────
+$ro-fact: #2f7d54;
+$ro-inference: #8f5f18;
+$ro-extracted: #8f5f18;
+
+// ── Radii ────────────────────────────────────────────────────────────────────
+$ro-radius: 14px;
+$ro-radius-sm: 10px;
+$ro-radius-xs: 7px;
+$ro-radius-pill: 999px;
+
+// ── Typography ───────────────────────────────────────────────────────────────
+$ro-font-sans: "General Sans", "Inter", -apple-system, BlinkMacSystemFont,
+  "Segoe UI", sans-serif;
+$ro-font-mono: ui-monospace, "SFMono-Regular", "Menlo", monospace;
+
+$ro-fs-micro: 0.625rem; // 10px — section eyebrows, provenance tags
+$ro-fs-tiny: 0.6875rem; // 11px — chips, meta
+$ro-fs-xs: 0.75rem; // 12px — labels, timestamps
+$ro-fs-sm: 0.8125rem; // 13px — dense list rows
+$ro-fs-base: 0.875rem; // 14px — body
+$ro-fs-md: 1rem; // 16px — card titles
+$ro-fs-lg: 1.25rem; // 20px — screen headings
+$ro-fs-xl: 1.5rem; // 24px — greeting
+$ro-fs-stat: 2rem; // 32px — stat tile numerals
+
+$ro-fw-regular: 400;
+$ro-fw-medium: 500;
+$ro-fw-semibold: 600;
+
+$ro-lh-tight: 1.2;
+$ro-lh-snug: 1.4;
+$ro-lh-body: 1.55;
+
+$ro-tracking-eyebrow: 0.08em;
+
+// ── Spacing (4px base) ───────────────────────────────────────────────────────
+$ro-space-1: 4px;
+$ro-space-2: 8px;
+$ro-space-3: 12px;
+$ro-space-4: 16px;
+$ro-space-5: 20px;
+$ro-space-6: 24px;
+$ro-space-8: 32px;
+$ro-space-10: 40px;
+$ro-space-12: 48px;
+$ro-space-16: 64px;
+
+// ── Elevation — hairlines do the work, shadows stay subtle ───────────────────
+$ro-shadow-sm: 0 1px 2px rgba(23, 24, 26, 0.04);
+$ro-shadow-md: 0 4px 16px rgba(23, 24, 26, 0.06);
+$ro-shadow-lg: 0 16px 48px rgba(23, 24, 26, 0.1);
+
+// ── Motion ───────────────────────────────────────────────────────────────────
+$ro-dur-fast: 120ms;
+$ro-dur-base: 200ms;
+$ro-dur-slow: 360ms;
+$ro-ease: cubic-bezier(0.2, 0.8, 0.2, 1);
+
+// ── Layout ───────────────────────────────────────────────────────────────────
+$ro-sidebar-w: 216px;
+$ro-content-max: 1120px;
+$ro-panel-w: 280px;
+
+// ── Breakpoints (mobile-first: use with min-width) ───────────────────────────
+$ro-bp-sm: 480px;
+$ro-bp-md: 768px;
+$ro-bp-lg: 1024px;
+$ro-bp-xl: 1280px;

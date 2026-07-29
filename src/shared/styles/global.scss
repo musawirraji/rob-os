@@ -1,0 +1,1794 @@
+// ─────────────────────────────────────────────────────────────────────────────
+// Rob OS — the one global stylesheet.
+// `@use "tokens" as *;` is auto-injected by next.config sassOptions, so the
+// `$ro-*` variables below resolve without an explicit import. Do not add one.
+//
+// Tokens are emitted once as CSS custom properties on :root; everything after
+// this block reads `var(--ro-*)`.
+// ─────────────────────────────────────────────────────────────────────────────
+
+:root {
+  // neutral base
+  --ro-canvas: #{$ro-canvas};
+  --ro-surface: #{$ro-surface};
+  --ro-surface-2: #{$ro-surface-2};
+  --ro-surface-3: #{$ro-surface-3};
+  --ro-ink: #{$ro-ink};
+  --ro-ink-2: #{$ro-ink-2};
+  --ro-muted: #{$ro-muted};
+  --ro-line: #{$ro-line};
+  --ro-line-2: #{$ro-line-2};
+
+  // object tiles
+  --ro-tile-person: #{$ro-tile-person};
+  --ro-tile-project: #{$ro-tile-project};
+  --ro-tile-company: #{$ro-tile-company};
+  --ro-tile-deal: #{$ro-tile-deal};
+  --ro-tile-meeting: #{$ro-tile-meeting};
+  --ro-tile-note: #{$ro-tile-note};
+
+  // pastel status
+  --ro-good-bg: #{$ro-good-bg};
+  --ro-good-fg: #{$ro-good-fg};
+  --ro-warn-bg: #{$ro-warn-bg};
+  --ro-warn-fg: #{$ro-warn-fg};
+  --ro-crit-bg: #{$ro-crit-bg};
+  --ro-crit-fg: #{$ro-crit-fg};
+  --ro-neut-bg: #{$ro-neut-bg};
+  --ro-neut-fg: #{$ro-neut-fg};
+
+  // provenance
+  --ro-fact: #{$ro-fact};
+  --ro-inference: #{$ro-inference};
+  --ro-extracted: #{$ro-extracted};
+
+  // radii
+  --ro-radius: #{$ro-radius};
+  --ro-radius-sm: #{$ro-radius-sm};
+  --ro-radius-xs: #{$ro-radius-xs};
+  --ro-radius-pill: #{$ro-radius-pill};
+
+  // type
+  --ro-font-sans: #{$ro-font-sans};
+  --ro-font-mono: #{$ro-font-mono};
+
+  // elevation
+  --ro-shadow-sm: #{$ro-shadow-sm};
+  --ro-shadow-md: #{$ro-shadow-md};
+  --ro-shadow-lg: #{$ro-shadow-lg};
+
+  // motion
+  --ro-dur-fast: #{$ro-dur-fast};
+  --ro-dur-base: #{$ro-dur-base};
+  --ro-dur-slow: #{$ro-dur-slow};
+  --ro-ease: #{$ro-ease};
+
+  // layout
+  --ro-sidebar-w: #{$ro-sidebar-w};
+  --ro-content-max: #{$ro-content-max};
+  --ro-panel-w: #{$ro-panel-w};
+}
+
+// ── Reset / base ─────────────────────────────────────────────────────────────
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  // Guard page-level horizontal scroll at the root, per the build conventions.
+  overflow-x: clip;
+  -webkit-text-size-adjust: 100%;
+}
+
+body {
+  margin: 0;
+  background: var(--ro-canvas);
+  color: var(--ro-ink);
+  font-family: var(--ro-font-sans);
+  font-size: $ro-fs-base;
+  line-height: $ro-lh-body;
+  font-weight: $ro-fw-regular;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+h1,
+h2,
+h3,
+h4,
+p,
+figure {
+  margin: 0;
+}
+
+h1,
+h2,
+h3,
+h4 {
+  font-weight: $ro-fw-semibold;
+  line-height: $ro-lh-tight;
+  letter-spacing: -0.01em;
+}
+
+ul,
+ol {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+img,
+svg,
+video {
+  display: block;
+  max-width: 100%;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+button,
+input,
+textarea,
+select {
+  font: inherit;
+  color: inherit;
+}
+
+button {
+  border: 0;
+  background: none;
+  cursor: pointer;
+  padding: 0;
+}
+
+:focus-visible {
+  outline: 2px solid var(--ro-ink);
+  outline-offset: 2px;
+  border-radius: var(--ro-radius-xs);
+}
+
+::selection {
+  background: var(--ro-surface-3);
+}
+
+// Wide content (tables, transcripts, code) scrolls inside its own container so
+// the page body never scrolls sideways.
+.ro-scroll-x {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+.ro-visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Primitives
+// ─────────────────────────────────────────────────────────────────────────────
+
+.ro-eyebrow {
+  font-size: $ro-fs-micro;
+  font-weight: $ro-fw-semibold;
+  letter-spacing: $ro-tracking-eyebrow;
+  text-transform: uppercase;
+  color: var(--ro-muted);
+}
+
+// Object tile — one of only two places colour appears.
+.ro-tile {
+  flex: none;
+  display: grid;
+  place-items: center;
+  border-radius: var(--ro-radius-sm);
+  color: var(--ro-surface);
+}
+
+// The source chip. The signature element: it repeats on every summary, feed item
+// and answer, and it is what makes a claim checkable.
+.ro-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  max-width: 100%;
+  padding: 3px $ro-space-2;
+  border: 1px solid var(--ro-line);
+  border-radius: var(--ro-radius-xs);
+  background: var(--ro-surface);
+  font-size: $ro-fs-tiny;
+  color: var(--ro-ink-2);
+  vertical-align: middle;
+
+  svg {
+    flex: none;
+    color: var(--ro-muted);
+  }
+}
+
+.ro-chip__kind {
+  color: var(--ro-ink-2);
+}
+
+.ro-chip__sep {
+  color: var(--ro-muted);
+}
+
+.ro-chip__title {
+  color: var(--ro-ink);
+  font-weight: $ro-fw-medium;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  max-width: 22ch;
+}
+
+a.ro-chip:hover {
+  border-color: rgba(23, 24, 26, 0.18);
+}
+
+// Provenance — a quiet text tag, deliberately not a badge.
+.ro-prov {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  font-size: $ro-fs-micro;
+  font-weight: $ro-fw-semibold;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+
+  &--fact {
+    color: var(--ro-fact);
+  }
+
+  &--inference,
+  &--recommendation {
+    color: var(--ro-inference);
+  }
+}
+
+.ro-badge {
+  flex: none;
+  padding: 2px $ro-space-2;
+  border-radius: var(--ro-radius-pill);
+  font-size: $ro-fs-tiny;
+  font-weight: $ro-fw-medium;
+  white-space: nowrap;
+  background: var(--ro-neut-bg);
+  color: var(--ro-neut-fg);
+
+  &--good {
+    background: var(--ro-good-bg);
+    color: var(--ro-good-fg);
+  }
+  &--warn {
+    background: var(--ro-warn-bg);
+    color: var(--ro-warn-fg);
+  }
+  &--crit {
+    background: var(--ro-crit-bg);
+    color: var(--ro-crit-fg);
+  }
+}
+
+.ro-card {
+  background: var(--ro-surface);
+  border: 1px solid var(--ro-line);
+  border-radius: var(--ro-radius);
+  box-shadow: var(--ro-shadow-sm);
+  padding: $ro-space-5;
+
+  &--flush {
+    padding: 0;
+  }
+}
+
+.ro-card__head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: $ro-space-4;
+  padding: $ro-space-4 $ro-space-5;
+  border-bottom: 1px solid var(--ro-line-2);
+}
+
+.ro-card__aside {
+  font-size: $ro-fs-tiny;
+  color: var(--ro-muted);
+}
+
+.ro-stat {
+  background: var(--ro-surface);
+  border: 1px solid var(--ro-line);
+  border-radius: var(--ro-radius);
+  padding: $ro-space-4 $ro-space-5;
+}
+
+.ro-stat__value {
+  margin-top: $ro-space-2;
+  font-size: $ro-fs-stat;
+  font-weight: $ro-fw-medium;
+  line-height: 1;
+  letter-spacing: -0.02em;
+}
+
+.ro-stat__detail {
+  margin-top: $ro-space-2;
+  font-size: $ro-fs-xs;
+  color: var(--ro-ink-2);
+}
+
+// Buttons. Primary is black on every surface — never coloured.
+.ro-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 7px $ro-space-3;
+  border-radius: var(--ro-radius-sm);
+  font-size: $ro-fs-sm;
+  font-weight: $ro-fw-medium;
+  border: 1px solid transparent;
+  transition:
+    background var(--ro-dur-fast) var(--ro-ease),
+    border-color var(--ro-dur-fast) var(--ro-ease);
+
+  &--primary {
+    background: var(--ro-ink);
+    color: var(--ro-surface);
+
+    &:hover {
+      background: #000;
+    }
+  }
+
+  &--secondary {
+    background: var(--ro-surface);
+    border-color: var(--ro-line);
+    color: var(--ro-ink);
+
+    &:hover {
+      background: var(--ro-surface-3);
+    }
+  }
+
+  &--ghost {
+    color: var(--ro-ink-2);
+
+    &:hover {
+      background: var(--ro-surface-3);
+      color: var(--ro-ink);
+    }
+  }
+
+  &:disabled {
+    opacity: 0.45;
+    cursor: not-allowed;
+  }
+}
+
+.ro-empty {
+  padding: $ro-space-10 $ro-space-5;
+  text-align: center;
+}
+
+.ro-empty__title {
+  font-weight: $ro-fw-medium;
+}
+
+.ro-empty__body {
+  margin-top: $ro-space-2;
+  font-size: $ro-fs-sm;
+  color: var(--ro-ink-2);
+}
+
+.ro-kbd {
+  font-family: var(--ro-font-sans);
+  font-size: $ro-fs-micro;
+  padding: 1px 5px;
+  border: 1px solid var(--ro-line);
+  border-radius: 5px;
+  color: var(--ro-muted);
+  background: var(--ro-surface-2);
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Shell
+// ─────────────────────────────────────────────────────────────────────────────
+
+.ro-shell {
+  min-height: 100dvh;
+  display: flex;
+  flex-direction: column;
+}
+
+.ro-sidebar {
+  display: none;
+  padding: $ro-space-4 $ro-space-3;
+  border-right: 1px solid var(--ro-line);
+  background: var(--ro-surface-2);
+}
+
+// Only becomes a column at the breakpoint where the sidebar is visible; the
+// `margin-top: auto` on the sign-out block needs it to push to the bottom.
+@media (min-width: $ro-bp-lg) {
+  .ro-sidebar {
+    display: flex;
+    flex-direction: column;
+  }
+}
+
+.ro-brand {
+  display: flex;
+  align-items: center;
+  gap: $ro-space-2;
+  padding: $ro-space-2;
+  margin-bottom: $ro-space-5;
+}
+
+.ro-brand__mark {
+  display: grid;
+  place-items: center;
+  width: 24px;
+  height: 24px;
+  border-radius: var(--ro-radius-xs);
+  background: var(--ro-ink);
+  color: var(--ro-surface);
+}
+
+.ro-brand__name {
+  font-weight: $ro-fw-semibold;
+  letter-spacing: -0.01em;
+}
+
+.ro-sidebar__group {
+  padding: $ro-space-4 $ro-space-2 $ro-space-2;
+}
+
+.ro-nav__item {
+  display: flex;
+  align-items: center;
+  gap: $ro-space-2;
+  padding: 7px $ro-space-2;
+  border-radius: var(--ro-radius-sm);
+  font-size: $ro-fs-sm;
+  color: var(--ro-ink-2);
+  transition: background var(--ro-dur-fast) var(--ro-ease);
+
+  svg {
+    flex: none;
+    color: var(--ro-muted);
+  }
+
+  &:hover {
+    background: var(--ro-surface-3);
+    color: var(--ro-ink);
+  }
+
+  // Active state is weight and ink, not a bar or a pip.
+  &.is-active {
+    background: var(--ro-surface-3);
+    color: var(--ro-ink);
+    font-weight: $ro-fw-medium;
+
+    svg {
+      color: var(--ro-ink);
+    }
+  }
+}
+
+.ro-nav__label {
+  flex: 1;
+}
+
+.ro-nav__count {
+  font-size: $ro-fs-tiny;
+  color: var(--ro-muted);
+}
+
+.ro-main {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.ro-topbar {
+  position: sticky;
+  top: 0;
+  z-index: 20;
+  display: flex;
+  align-items: center;
+  gap: $ro-space-3;
+  padding: $ro-space-3 $ro-space-4;
+  background: rgba(246, 247, 248, 0.88);
+  backdrop-filter: blur(8px);
+  border-bottom: 1px solid var(--ro-line-2);
+}
+
+.ro-search {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  gap: $ro-space-2;
+  padding: 7px $ro-space-3;
+  border: 1px solid var(--ro-line);
+  border-radius: var(--ro-radius-sm);
+  background: var(--ro-surface);
+  text-align: left;
+
+  svg {
+    flex: none;
+    color: var(--ro-muted);
+  }
+
+  &:hover {
+    border-color: rgba(23, 24, 26, 0.16);
+  }
+}
+
+.ro-search__placeholder {
+  flex: 1;
+  font-size: $ro-fs-sm;
+  color: var(--ro-muted);
+}
+
+.ro-content {
+  flex: 1;
+  width: 100%;
+  max-width: var(--ro-content-max);
+  margin: 0 auto;
+  padding: $ro-space-5 $ro-space-4 $ro-space-12;
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Today
+// ─────────────────────────────────────────────────────────────────────────────
+
+.ro-today__greeting {
+  font-size: $ro-fs-xl;
+
+  span {
+    color: var(--ro-ink-2);
+    font-weight: $ro-fw-regular;
+  }
+}
+
+.ro-today__headline {
+  margin-top: $ro-space-2;
+  color: var(--ro-ink-2);
+  font-size: $ro-fs-sm;
+}
+
+.ro-today__stats {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: $ro-space-3;
+  margin: $ro-space-6 0;
+}
+
+.ro-brief__row {
+  display: flex;
+  align-items: flex-start;
+  gap: $ro-space-3;
+  padding: $ro-space-4 $ro-space-5;
+  border-bottom: 1px solid var(--ro-line-2);
+  font-size: $ro-fs-sm;
+
+  &:last-child {
+    border-bottom: 0;
+  }
+}
+
+a.ro-brief__row:hover {
+  background: var(--ro-surface-2);
+}
+
+.ro-brief__icon {
+  flex: none;
+  display: grid;
+  place-items: center;
+  width: 26px;
+  height: 26px;
+  border-radius: var(--ro-radius-xs);
+  background: var(--ro-surface-3);
+  color: var(--ro-ink-2);
+}
+
+.ro-brief__text {
+  flex: 1;
+  min-width: 0;
+  line-height: $ro-lh-snug;
+}
+
+.ro-brief__meta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: $ro-space-2;
+  margin-top: $ro-space-2;
+}
+
+.ro-note {
+  margin-top: $ro-space-4;
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Command palette
+// ─────────────────────────────────────────────────────────────────────────────
+
+// A transparent catcher, not a dimming overlay: the page behind stays readable.
+.ro-palette__catcher {
+  position: fixed;
+  inset: 0;
+  z-index: 40;
+  cursor: default;
+}
+
+.ro-palette {
+  position: fixed;
+  z-index: 41;
+  top: 12vh;
+  left: 50%;
+  transform: translateX(-50%);
+  width: min(560px, calc(100vw - #{$ro-space-6}));
+  background: var(--ro-surface);
+  border: 1px solid var(--ro-line);
+  border-radius: var(--ro-radius);
+  box-shadow: var(--ro-shadow-lg);
+  overflow: hidden;
+}
+
+.ro-palette__field {
+  display: flex;
+  align-items: center;
+  gap: $ro-space-2;
+  padding: $ro-space-4;
+  border-bottom: 1px solid var(--ro-line-2);
+
+  svg {
+    color: var(--ro-muted);
+  }
+}
+
+.ro-palette__input {
+  flex: 1;
+  border: 0;
+  outline: 0;
+  background: none;
+  font-size: $ro-fs-base;
+
+  &::placeholder {
+    color: var(--ro-muted);
+  }
+}
+
+.ro-palette__results {
+  max-height: 52vh;
+  overflow-y: auto;
+}
+
+.ro-palette__group {
+  padding: $ro-space-3 0;
+
+  .ro-eyebrow {
+    padding: 0 $ro-space-4 $ro-space-2;
+  }
+}
+
+.ro-palette__row {
+  display: flex;
+  align-items: center;
+  gap: $ro-space-3;
+  padding: $ro-space-2 $ro-space-4;
+  font-size: $ro-fs-sm;
+
+  &.is-selected {
+    background: var(--ro-surface-3);
+  }
+}
+
+.ro-palette__name {
+  font-weight: $ro-fw-medium;
+}
+
+.ro-palette__sub {
+  flex: 1;
+  color: var(--ro-muted);
+  font-size: $ro-fs-xs;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.ro-palette__none {
+  padding: $ro-space-6 $ro-space-4;
+  font-size: $ro-fs-sm;
+  color: var(--ro-ink-2);
+}
+
+.ro-palette__foot {
+  display: flex;
+  gap: $ro-space-4;
+  padding: $ro-space-2 $ro-space-4;
+  border-top: 1px solid var(--ro-line-2);
+  background: var(--ro-surface-2);
+  font-size: $ro-fs-micro;
+  color: var(--ro-muted);
+
+  span {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+  }
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Responsive — mobile first, layered up
+// ─────────────────────────────────────────────────────────────────────────────
+
+@media (min-width: $ro-bp-md) {
+  .ro-today__stats {
+    grid-template-columns: repeat(3, 1fr);
+  }
+
+  .ro-content {
+    padding: $ro-space-6 $ro-space-6 $ro-space-16;
+  }
+
+  .ro-topbar {
+    padding: $ro-space-3 $ro-space-6;
+  }
+}
+
+@media (min-width: $ro-bp-lg) {
+  .ro-shell {
+    flex-direction: row;
+  }
+
+  .ro-sidebar {
+    display: block;
+    position: sticky;
+    top: 0;
+    height: 100dvh;
+    width: var(--ro-sidebar-w);
+    flex: none;
+  }
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Index pages
+// ─────────────────────────────────────────────────────────────────────────────
+
+.ro-index__title {
+  font-size: $ro-fs-lg;
+}
+
+.ro-index__sub {
+  margin: $ro-space-2 0 $ro-space-5;
+  font-size: $ro-fs-sm;
+  color: var(--ro-ink-2);
+}
+
+.ro-index .ro-card + .ro-card {
+  margin-top: $ro-space-4;
+}
+
+.ro-list__row {
+  display: flex;
+  align-items: center;
+  gap: $ro-space-3;
+  padding: $ro-space-3 $ro-space-5;
+  border-bottom: 1px solid var(--ro-line-2);
+  font-size: $ro-fs-sm;
+
+  &:last-child {
+    border-bottom: 0;
+  }
+
+  &:hover {
+    background: var(--ro-surface-2);
+  }
+}
+
+.ro-list__body {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+}
+
+.ro-list__name {
+  font-weight: $ro-fw-medium;
+}
+
+.ro-list__sub {
+  color: var(--ro-ink-2);
+  font-size: $ro-fs-xs;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.ro-list__meta {
+  flex: none;
+  color: var(--ro-muted);
+  font-size: $ro-fs-tiny;
+  font-variant-numeric: tabular-nums;
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Object record — three panes
+// ─────────────────────────────────────────────────────────────────────────────
+
+.ro-object {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: $ro-space-5;
+  align-items: start;
+}
+
+.ro-detail {
+  background: var(--ro-surface);
+  border: 1px solid var(--ro-line);
+  border-radius: var(--ro-radius);
+  padding: $ro-space-5;
+}
+
+.ro-detail__avatar {
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  border-radius: var(--ro-radius-sm);
+  color: var(--ro-surface);
+  font-size: $ro-fs-sm;
+  font-weight: $ro-fw-semibold;
+  letter-spacing: 0.02em;
+}
+
+.ro-detail__name {
+  margin-top: $ro-space-4;
+  font-size: $ro-fs-md;
+}
+
+.ro-detail__sub {
+  margin-top: $ro-space-1;
+  font-size: $ro-fs-xs;
+  color: var(--ro-ink-2);
+}
+
+.ro-detail__actions {
+  display: flex;
+  gap: $ro-space-2;
+  margin-top: $ro-space-4;
+}
+
+.ro-detail__action {
+  display: grid;
+  place-items: center;
+  width: 28px;
+  height: 28px;
+  border: 1px solid var(--ro-line);
+  border-radius: var(--ro-radius-xs);
+  color: var(--ro-ink-2);
+
+  &:hover {
+    background: var(--ro-surface-3);
+    color: var(--ro-ink);
+  }
+}
+
+.ro-detail__facts {
+  margin: $ro-space-5 0 0;
+  border-top: 1px solid var(--ro-line-2);
+}
+
+.ro-detail__fact {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: $ro-space-3;
+  padding: $ro-space-3 0;
+  border-bottom: 1px solid var(--ro-line-2);
+
+  dt {
+    flex: none;
+    font-size: $ro-fs-xs;
+    color: var(--ro-muted);
+  }
+
+  dd {
+    margin: 0;
+    text-align: right;
+    font-size: $ro-fs-xs;
+    color: var(--ro-ink);
+  }
+}
+
+.ro-object__main {
+  min-width: 0;
+}
+
+.ro-object__stack > * + * {
+  margin-top: $ro-space-4;
+}
+
+.ro-tabs {
+  display: flex;
+  gap: $ro-space-4;
+  overflow-x: auto;
+  margin-bottom: $ro-space-4;
+  border-bottom: 1px solid var(--ro-line);
+  -webkit-overflow-scrolling: touch;
+}
+
+// Active tab is weight plus a hairline, never a coloured bar.
+.ro-tabs__tab {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 0 0 $ro-space-3;
+  margin-bottom: -1px;
+  white-space: nowrap;
+  font-size: $ro-fs-sm;
+  color: var(--ro-ink-2);
+  border-bottom: 1px solid transparent;
+
+  &:hover {
+    color: var(--ro-ink);
+  }
+
+  &.is-active {
+    color: var(--ro-ink);
+    font-weight: $ro-fw-medium;
+    border-bottom-color: var(--ro-ink);
+  }
+}
+
+.ro-tabs__count {
+  font-size: $ro-fs-micro;
+  color: var(--ro-muted);
+}
+
+// ── Living summary ───────────────────────────────────────────────────────────
+
+.ro-summary__meta {
+  display: inline-flex;
+  align-items: center;
+  gap: $ro-space-2;
+}
+
+.ro-summary__conf {
+  font-size: $ro-fs-micro;
+  color: var(--ro-muted);
+  font-variant-numeric: tabular-nums;
+}
+
+.ro-summary__body {
+  padding: $ro-space-4 $ro-space-5;
+  font-size: $ro-fs-sm;
+  line-height: $ro-lh-body;
+}
+
+.ro-summary__chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: $ro-space-2;
+  margin-top: $ro-space-3;
+}
+
+.ro-summary__stamp {
+  margin-top: $ro-space-3;
+  font-size: $ro-fs-micro;
+  color: var(--ro-muted);
+}
+
+.ro-summary__none {
+  padding: $ro-space-5;
+  font-size: $ro-fs-sm;
+  color: var(--ro-ink-2);
+}
+
+// ── Activity feed ────────────────────────────────────────────────────────────
+
+.ro-feed__row {
+  display: flex;
+  align-items: flex-start;
+  gap: $ro-space-3;
+  padding: $ro-space-4 $ro-space-5;
+  border-bottom: 1px solid var(--ro-line-2);
+
+  &:last-child {
+    border-bottom: 0;
+  }
+}
+
+.ro-feed__icon {
+  flex: none;
+  display: grid;
+  place-items: center;
+  width: 24px;
+  height: 24px;
+  border-radius: var(--ro-radius-xs);
+  background: var(--ro-surface-3);
+  color: var(--ro-ink-2);
+}
+
+.ro-feed__body {
+  flex: 1;
+  min-width: 0;
+}
+
+.ro-feed__title {
+  display: flex;
+  align-items: center;
+  gap: $ro-space-2;
+  font-size: $ro-fs-sm;
+  font-weight: $ro-fw-medium;
+}
+
+.ro-feed__detail {
+  margin-top: $ro-space-1;
+  font-size: $ro-fs-sm;
+  color: var(--ro-ink-2);
+  line-height: $ro-lh-snug;
+}
+
+.ro-feed__meta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: $ro-space-2;
+  margin-top: $ro-space-2;
+}
+
+.ro-feed__age {
+  flex: none;
+  font-size: $ro-fs-tiny;
+  color: var(--ro-muted);
+  font-variant-numeric: tabular-nums;
+}
+
+.ro-blockers__item {
+  padding: $ro-space-3 $ro-space-5;
+  border-bottom: 1px solid var(--ro-line-2);
+  font-size: $ro-fs-sm;
+
+  &:last-child {
+    border-bottom: 0;
+  }
+}
+
+.ro-transcript {
+  margin: 0;
+  padding: $ro-space-4 $ro-space-5;
+  font-family: var(--ro-font-mono);
+  font-size: $ro-fs-xs;
+  line-height: $ro-lh-body;
+  white-space: pre-wrap;
+  color: var(--ro-ink-2);
+  max-height: 60vh;
+  overflow-y: auto;
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Ask
+// ─────────────────────────────────────────────────────────────────────────────
+
+.ro-ask__title {
+  font-size: $ro-fs-lg;
+}
+
+.ro-ask__sub {
+  margin-top: $ro-space-2;
+  font-size: $ro-fs-sm;
+  color: var(--ro-ink-2);
+}
+
+.ro-ask__form {
+  display: flex;
+  align-items: center;
+  gap: $ro-space-2;
+  margin: $ro-space-5 0;
+  padding: $ro-space-2 $ro-space-3;
+  background: var(--ro-surface);
+  border: 1px solid var(--ro-line);
+  border-radius: var(--ro-radius);
+
+  svg {
+    flex: none;
+    color: var(--ro-muted);
+  }
+
+  &:focus-within {
+    border-color: rgba(23, 24, 26, 0.22);
+  }
+}
+
+.ro-ask__input {
+  flex: 1;
+  min-width: 0;
+  border: 0;
+  outline: 0;
+  background: none;
+  padding: $ro-space-2 0;
+  font-size: $ro-fs-base;
+
+  &::placeholder {
+    color: var(--ro-muted);
+  }
+}
+
+.ro-ask__examples {
+  margin-top: $ro-space-3;
+  display: flex;
+  flex-direction: column;
+  gap: $ro-space-2;
+
+  a {
+    font-size: $ro-fs-sm;
+    color: var(--ro-ink-2);
+    border-bottom: 1px solid var(--ro-line);
+
+    &:hover {
+      color: var(--ro-ink);
+    }
+  }
+}
+
+.ro-ask__hint,
+.ro-ask__unavailable {
+  margin-top: $ro-space-3;
+  font-size: $ro-fs-xs;
+  color: var(--ro-muted);
+}
+
+.ro-ask__layout {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: $ro-space-4;
+  align-items: start;
+}
+
+.ro-ask__question {
+  margin-bottom: $ro-space-4;
+  padding: $ro-space-3 $ro-space-4;
+  background: var(--ro-surface-3);
+  border-radius: var(--ro-radius);
+  font-size: $ro-fs-sm;
+  font-weight: $ro-fw-medium;
+}
+
+.ro-ask__sources {
+  margin-bottom: $ro-space-4;
+}
+
+.ro-ask__cards {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: $ro-space-3;
+  margin-top: $ro-space-3;
+}
+
+.ro-ask__card {
+  background: var(--ro-surface);
+  border: 1px solid var(--ro-line);
+  border-radius: var(--ro-radius-sm);
+  padding: $ro-space-3;
+}
+
+.ro-ask__cardTitle {
+  display: flex;
+  align-items: baseline;
+  gap: $ro-space-2;
+  font-size: $ro-fs-sm;
+  font-weight: $ro-fw-medium;
+}
+
+.ro-ask__cardMeta {
+  margin-top: 2px;
+  font-size: $ro-fs-micro;
+  color: var(--ro-muted);
+  text-transform: uppercase;
+  letter-spacing: $ro-tracking-eyebrow;
+}
+
+.ro-ask__cardExcerpt {
+  margin-top: $ro-space-2;
+  font-size: $ro-fs-xs;
+  color: var(--ro-ink-2);
+  line-height: $ro-lh-snug;
+  display: -webkit-box;
+  -webkit-line-clamp: 4;
+  line-clamp: 4;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+// The citation marker. Small, tabular, never a link-blue.
+.ro-cite {
+  display: inline-grid;
+  place-items: center;
+  min-width: 14px;
+  height: 14px;
+  margin-left: 3px;
+  padding: 0 3px;
+  border-radius: 4px;
+  background: var(--ro-surface-3);
+  color: var(--ro-ink-2);
+  font-size: 9px;
+  font-weight: $ro-fw-semibold;
+  vertical-align: super;
+  font-variant-numeric: tabular-nums;
+
+  &--card {
+    vertical-align: baseline;
+    background: var(--ro-ink);
+    color: var(--ro-surface);
+  }
+}
+
+.ro-ask__grounded,
+.ro-ask__partial {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: $ro-fs-micro;
+  font-weight: $ro-fw-semibold;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+.ro-ask__grounded {
+  color: var(--ro-fact);
+}
+
+.ro-ask__partial {
+  color: var(--ro-inference);
+}
+
+.ro-ask__body {
+  padding: $ro-space-4 $ro-space-5;
+}
+
+.ro-ask__claim {
+  font-size: $ro-fs-base;
+  line-height: $ro-lh-body;
+
+  & + & {
+    margin-top: $ro-space-3;
+  }
+
+  .ro-prov {
+    margin-left: $ro-space-2;
+  }
+
+  &--none {
+    color: var(--ro-ink-2);
+  }
+}
+
+// The abstain block is as prominent as the answer. That is the point.
+.ro-abstain {
+  display: flex;
+  gap: $ro-space-3;
+  margin-top: $ro-space-5;
+  padding: $ro-space-4;
+  background: var(--ro-warn-bg);
+  border-radius: var(--ro-radius-sm);
+  color: var(--ro-warn-fg);
+
+  svg {
+    flex: none;
+    margin-top: 2px;
+  }
+}
+
+.ro-abstain__lead {
+  font-size: $ro-fs-sm;
+  font-weight: $ro-fw-medium;
+}
+
+.ro-abstain__list {
+  margin-top: $ro-space-2;
+  display: flex;
+  flex-direction: column;
+  gap: $ro-space-1;
+  font-size: $ro-fs-sm;
+
+  li::before {
+    content: "— ";
+  }
+}
+
+.ro-ask__rail > * + * {
+  margin-top: $ro-space-3;
+}
+
+.ro-ask__objects li a {
+  display: flex;
+  align-items: center;
+  gap: $ro-space-2;
+  padding: $ro-space-2 0;
+  font-size: $ro-fs-sm;
+}
+
+.ro-ask__objectName {
+  font-weight: $ro-fw-medium;
+}
+
+.ro-ask__objectSub {
+  flex: 1;
+  text-align: right;
+  font-size: $ro-fs-tiny;
+  color: var(--ro-muted);
+}
+
+.ro-ask__next {
+  margin-top: $ro-space-2;
+
+  li {
+    padding: $ro-space-2 0;
+    border-bottom: 1px solid var(--ro-line-2);
+    font-size: $ro-fs-sm;
+    color: var(--ro-ink-2);
+
+    &:last-child {
+      border-bottom: 0;
+    }
+  }
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Review queue
+// ─────────────────────────────────────────────────────────────────────────────
+
+.ro-review__flash {
+  display: flex;
+  align-items: center;
+  gap: $ro-space-2;
+  margin-bottom: $ro-space-4;
+  padding: $ro-space-3 $ro-space-4;
+  background: var(--ro-good-bg);
+  color: var(--ro-good-fg);
+  border-radius: var(--ro-radius-sm);
+  font-size: $ro-fs-sm;
+}
+
+.ro-review__stack > * + * {
+  margin-top: $ro-space-4;
+}
+
+.ro-review {
+  background: var(--ro-surface);
+  border: 1px solid var(--ro-line);
+  border-radius: var(--ro-radius);
+  padding: $ro-space-5;
+}
+
+.ro-review__head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: $ro-space-4;
+}
+
+.ro-review__kind {
+  display: flex;
+  align-items: center;
+  gap: $ro-space-2;
+  font-size: $ro-fs-micro;
+  text-transform: uppercase;
+  letter-spacing: $ro-tracking-eyebrow;
+  color: var(--ro-muted);
+}
+
+.ro-review__headline {
+  margin-top: $ro-space-2;
+  font-size: $ro-fs-md;
+}
+
+.ro-review__detail {
+  margin-top: $ro-space-1;
+  font-size: $ro-fs-xs;
+  color: var(--ro-ink-2);
+}
+
+.ro-review__reason {
+  flex: none;
+  font-size: $ro-fs-tiny;
+  color: var(--ro-inference);
+  text-align: right;
+}
+
+// The passage is shown in full — judging a claim without it is guesswork.
+.ro-review__excerpt {
+  margin: $ro-space-4 0 0;
+  padding: $ro-space-3 $ro-space-4;
+  border-left: 2px solid var(--ro-line);
+  background: var(--ro-surface-2);
+  font-size: $ro-fs-sm;
+  color: var(--ro-ink-2);
+  line-height: $ro-lh-body;
+}
+
+.ro-review__source {
+  margin-top: $ro-space-3;
+}
+
+.ro-review__candidates {
+  margin-top: $ro-space-4;
+}
+
+.ro-review__candidateList {
+  display: flex;
+  flex-direction: column;
+  gap: $ro-space-2;
+  margin-top: $ro-space-2;
+}
+
+.ro-review__candidate {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: $ro-space-3;
+  padding: $ro-space-2 $ro-space-3;
+  border: 1px solid var(--ro-line);
+  border-radius: var(--ro-radius-sm);
+  background: var(--ro-surface);
+  text-align: left;
+  font-size: $ro-fs-sm;
+
+  svg {
+    flex: none;
+    color: var(--ro-muted);
+  }
+
+  &:hover {
+    background: var(--ro-surface-3);
+
+    svg {
+      color: var(--ro-fact);
+    }
+  }
+}
+
+.ro-review__candidateName {
+  font-weight: $ro-fw-medium;
+}
+
+.ro-review__candidateScore {
+  flex: 1;
+  font-size: $ro-fs-tiny;
+  color: var(--ro-muted);
+}
+
+.ro-review__actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: $ro-space-2;
+  margin-top: $ro-space-5;
+  padding-top: $ro-space-4;
+  border-top: 1px solid var(--ro-line-2);
+}
+
+.ro-review__note {
+  flex: 1;
+  min-width: 200px;
+  font-size: $ro-fs-micro;
+  color: var(--ro-muted);
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Inbox
+// ─────────────────────────────────────────────────────────────────────────────
+
+.ro-inbox__row {
+  display: flex;
+  align-items: flex-start;
+  gap: $ro-space-3;
+  padding: $ro-space-3 $ro-space-5;
+  border-bottom: 1px solid var(--ro-line-2);
+
+  &:last-child {
+    border-bottom: 0;
+  }
+}
+
+.ro-inbox__icon {
+  flex: none;
+  display: grid;
+  place-items: center;
+  width: 24px;
+  height: 24px;
+  border-radius: var(--ro-radius-xs);
+  background: var(--ro-surface-3);
+  color: var(--ro-ink-2);
+}
+
+.ro-inbox__body {
+  flex: 1;
+  min-width: 0;
+}
+
+.ro-inbox__title {
+  font-size: $ro-fs-sm;
+  font-weight: $ro-fw-medium;
+}
+
+.ro-inbox__meta {
+  margin-top: 2px;
+  font-size: $ro-fs-tiny;
+  color: var(--ro-muted);
+}
+
+.ro-inbox__error {
+  margin-top: $ro-space-2;
+  font-size: $ro-fs-tiny;
+  color: var(--ro-crit-fg);
+}
+
+.ro-inbox__age {
+  flex: none;
+  font-size: $ro-fs-tiny;
+  color: var(--ro-muted);
+  font-variant-numeric: tabular-nums;
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Responsive — the record and Ask go multi-column only when there is room
+// ─────────────────────────────────────────────────────────────────────────────
+
+@media (min-width: $ro-bp-md) {
+  .ro-ask__cards {
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  }
+}
+
+@media (min-width: $ro-bp-lg) {
+  .ro-object {
+    grid-template-columns: var(--ro-panel-w) minmax(0, 1fr);
+  }
+
+  .ro-detail {
+    position: sticky;
+    top: calc(#{$ro-space-12} + #{$ro-space-2});
+  }
+
+  .ro-ask__layout {
+    grid-template-columns: minmax(0, 1fr) 260px;
+  }
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Capture
+// ─────────────────────────────────────────────────────────────────────────────
+
+.ro-capture {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: $ro-space-4;
+  margin-bottom: $ro-space-5;
+}
+
+.ro-capture__flash {
+  display: flex;
+  align-items: flex-start;
+  gap: $ro-space-2;
+  margin-bottom: $ro-space-4;
+  padding: $ro-space-3 $ro-space-4;
+  background: var(--ro-good-bg);
+  color: var(--ro-good-fg);
+  border-radius: var(--ro-radius-sm);
+  font-size: $ro-fs-sm;
+  line-height: $ro-lh-snug;
+
+  svg {
+    flex: none;
+    margin-top: 2px;
+  }
+
+  &.is-error {
+    background: var(--ro-crit-bg);
+    color: var(--ro-crit-fg);
+  }
+}
+
+.ro-capture__form {
+  padding: $ro-space-4 $ro-space-5 $ro-space-5;
+}
+
+.ro-capture__row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: $ro-space-2;
+  margin-bottom: $ro-space-3;
+}
+
+.ro-capture__input,
+.ro-capture__select,
+.ro-capture__textarea,
+.ro-capture__file {
+  border: 1px solid var(--ro-line);
+  border-radius: var(--ro-radius-sm);
+  background: var(--ro-surface);
+  padding: 7px $ro-space-3;
+  font-size: $ro-fs-sm;
+
+  &:focus {
+    outline: 0;
+    border-color: rgba(23, 24, 26, 0.22);
+  }
+
+  &::placeholder {
+    color: var(--ro-muted);
+  }
+}
+
+.ro-capture__input {
+  flex: 1;
+  min-width: 0;
+}
+
+.ro-capture__select {
+  flex: none;
+  text-transform: capitalize;
+}
+
+.ro-capture__textarea {
+  width: 100%;
+  resize: vertical;
+  line-height: $ro-lh-body;
+  font-family: var(--ro-font-sans);
+}
+
+.ro-capture__file {
+  width: 100%;
+  margin-bottom: $ro-space-3;
+  color: var(--ro-ink-2);
+}
+
+.ro-capture__actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: $ro-space-3;
+  margin-top: $ro-space-3;
+}
+
+.ro-capture__note {
+  flex: 1;
+  min-width: 180px;
+  font-size: $ro-fs-micro;
+  color: var(--ro-muted);
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Sign in
+// ─────────────────────────────────────────────────────────────────────────────
+
+.ro-login {
+  min-height: 100dvh;
+  display: grid;
+  place-items: center;
+  padding: $ro-space-6;
+}
+
+.ro-login__card {
+  width: 100%;
+  max-width: 400px;
+  background: var(--ro-surface);
+  border: 1px solid var(--ro-line);
+  border-radius: var(--ro-radius);
+  box-shadow: var(--ro-shadow-sm);
+  padding: $ro-space-6;
+}
+
+.ro-login__mark {
+  display: grid;
+  place-items: center;
+  width: 30px;
+  height: 30px;
+  border-radius: var(--ro-radius-xs);
+  background: var(--ro-ink);
+  color: var(--ro-surface);
+}
+
+.ro-login__title {
+  margin-top: $ro-space-4;
+  font-size: $ro-fs-lg;
+}
+
+.ro-login__sub {
+  margin-top: $ro-space-2;
+  font-size: $ro-fs-sm;
+  color: var(--ro-ink-2);
+}
+
+.ro-login__form {
+  margin-top: $ro-space-5;
+  display: flex;
+  flex-direction: column;
+  gap: $ro-space-3;
+}
+
+.ro-login__input {
+  border: 1px solid var(--ro-line);
+  border-radius: var(--ro-radius-sm);
+  background: var(--ro-surface);
+  padding: 9px $ro-space-3;
+  font-size: $ro-fs-base;
+
+  &:focus {
+    outline: 0;
+    border-color: rgba(23, 24, 26, 0.22);
+  }
+}
+
+.ro-login__note {
+  margin-top: $ro-space-4;
+  padding-top: $ro-space-4;
+  border-top: 1px solid var(--ro-line-2);
+  font-size: $ro-fs-xs;
+  color: var(--ro-muted);
+  line-height: $ro-lh-snug;
+}
+
+.ro-login__flash {
+  margin-top: $ro-space-4;
+  padding: $ro-space-3;
+  border-radius: var(--ro-radius-sm);
+  background: var(--ro-good-bg);
+  color: var(--ro-good-fg);
+  font-size: $ro-fs-sm;
+
+  &.is-error {
+    background: var(--ro-crit-bg);
+    color: var(--ro-crit-fg);
+  }
+}
+
+.ro-signout {
+  margin-top: auto;
+  padding-top: $ro-space-4;
+}
+
+@media (min-width: $ro-bp-md) {
+  .ro-capture {
+    grid-template-columns: 1fr 1fr;
+    align-items: start;
+  }
+}
+
+.ro-signout__who {
+  padding: 0 $ro-space-2 $ro-space-2;
+  font-size: $ro-fs-micro;
+  color: var(--ro-muted);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}

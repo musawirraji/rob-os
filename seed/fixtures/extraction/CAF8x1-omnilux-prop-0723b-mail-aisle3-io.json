@@ -1,0 +1,67 @@
+{
+  "people": [
+    {
+      "name": "Sarah Lin",
+      "role": null,
+      "companyName": "Omnilux",
+      "email": "sarah.lin@omnilux.io",
+      "quote": "To: Sarah Lin <sarah.lin@omnilux.io>",
+      "factType": "direct_source_fact",
+      "confidence": 0.97
+    },
+    {
+      "name": "Daniel",
+      "role": null,
+      "companyName": "Omnilux",
+      "email": null,
+      "quote": "Let me put both options in and Daniel can pick.",
+      "factType": "extracted",
+      "confidence": 0.72
+    }
+  ],
+  "companies": [
+    {
+      "name": "Omnilux",
+      "industry": null,
+      "quote": "revised Omnilux proposal",
+      "factType": "direct_source_fact",
+      "confidence": 0.95
+    }
+  ],
+  "projects": [],
+  "commitments": [
+    {
+      "owedBy": "principal",
+      "owedTo": "Sarah Lin",
+      "what": "Send the revised Omnilux proposal with pricing broken out by tier — build, integration and support on separate lines",
+      "deadline": "2026-07-24",
+      "commitmentType": "explicit",
+      "quote": "I'll send you the revised Omnilux proposal with pricing broken out by tier",
+      "factType": "direct_source_fact",
+      "confidence": 0.96
+    }
+  ],
+  "tasks": [],
+  "decisions": [
+    {
+      "statement": "Offer both an annual support figure and rolling monthly, and let Omnilux choose",
+      "decisionMaker": "principal",
+      "rationale": "An annual figure may fit Omnilux's capex cycle better than rolling monthly",
+      "alternatives": [
+        "Keep rolling monthly only"
+      ],
+      "reversible": true,
+      "quote": "Let me put both options in and Daniel can pick.",
+      "factType": "direct_source_fact",
+      "confidence": 0.88,
+      "peopleInvolved": [
+        "Sarah Lin",
+        "Daniel"
+      ]
+    }
+  ],
+  "risks": [],
+  "openQuestions": [],
+  "sentiment": "neutral",
+  "gist": "Rob commits to sending Sarah a revised Omnilux proposal by Friday with pricing broken out by tier, and offers an annual support option."
+}

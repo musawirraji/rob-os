@@ -1,0 +1,80 @@
+{
+  "people": [
+    {
+      "name": "David Reyes",
+      "role": "Procurement",
+      "companyName": "Revolt Inc",
+      "email": "d.reyes@revolt.inc",
+      "quote": "From: David Reyes <d.reyes@revolt.inc>",
+      "factType": "direct_source_fact",
+      "confidence": 0.97
+    },
+    {
+      "name": "Mike Banner",
+      "role": null,
+      "companyName": "Revolt Inc",
+      "email": "m.banner@revolt.inc",
+      "quote": "Cc: Mike Banner <m.banner@revolt.inc>",
+      "factType": "direct_source_fact",
+      "confidence": 0.95
+    }
+  ],
+  "companies": [
+    {
+      "name": "Revolt Inc",
+      "industry": null,
+      "quote": "Procurement, Revolt Inc",
+      "factType": "direct_source_fact",
+      "confidence": 0.94
+    }
+  ],
+  "projects": [],
+  "commitments": [
+    {
+      "owedBy": "principal",
+      "owedTo": "Mike Banner",
+      "what": "Send the revised SOW",
+      "deadline": "2026-07-27",
+      "commitmentType": "explicit",
+      "quote": "Mike said you'd promised him the updated version",
+      "factType": "extracted",
+      "confidence": 0.85
+    },
+    {
+      "owedBy": "David Reyes",
+      "owedTo": "principal",
+      "what": "Turn procurement's side around the same day the SOW arrives",
+      "deadline": null,
+      "commitmentType": "waiting",
+      "quote": "Send it over and I'll turn my side around same day.",
+      "factType": "direct_source_fact",
+      "confidence": 0.9
+    },
+    {
+      "owedBy": "legal",
+      "owedTo": "principal",
+      "what": "Review the SOW before the August intake closes",
+      "deadline": null,
+      "commitmentType": "implied",
+      "quote": "If I don't get it in front of legal this week it",
+      "factType": "inference",
+      "confidence": 0.82
+    }
+  ],
+  "tasks": [],
+  "decisions": [],
+  "risks": [
+    {
+      "description": "Missing this week's legal intake pushes the Revolt engagement into the August intake and a September start.",
+      "subject": "Revolt Inc",
+      "quote": "rolls into the August intake and then we're looking at a September start, which",
+      "factType": "direct_source_fact",
+      "confidence": 0.92
+    }
+  ],
+  "openQuestions": [
+    "How many days does the Revolt legal review actually take?"
+  ],
+  "sentiment": "tense",
+  "gist": "Revolt's procurement contact is blocked on the revised SOW and warns that missing this week means a September start."
+}

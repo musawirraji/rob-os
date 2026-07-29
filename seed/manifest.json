@@ -1,0 +1,179 @@
+{
+  "workspace": {
+    "name": "Aisle3",
+    "principalName": "Rob Aitken",
+    "principalCompany": "Aisle3",
+    "principalEmails": ["rob@aisle3.io"],
+    "timezone": "Europe/London"
+  },
+  "generatedFor": "2026-07-29",
+  "sources": [
+    {
+      "originalRef": "CAF8x1-omnilux-prop-0720@mail.aisle3.io",
+      "kind": "email",
+      "title": "Omnilux — proposal attached",
+      "path": "emails/2026-07-20-omnilux-proposal-sent.eml",
+      "occurredAt": "2026-07-20T09:12:04+01:00",
+      "author": "Rob Aitken <rob@aisle3.io>",
+      "participants": [
+        "Rob Aitken <rob@aisle3.io>",
+        "Sarah Lin <sarah.lin@omnilux.io>",
+        "Priya Raman <priya@aisle3.io>"
+      ]
+    },
+    {
+      "originalRef": "revolt-next-stage-planning-0723",
+      "kind": "meeting",
+      "title": "Next-stage planning — Revolt Inc",
+      "path": "meetings/2026-07-23-revolt-next-stage-planning.md",
+      "occurredAt": "2026-07-23T10:00:00+01:00",
+      "author": "Granola",
+      "participants": [
+        "Rob Aitken <rob@aisle3.io>",
+        "Mike Banner <m.banner@revolt.inc>",
+        "Priya Raman <priya@aisle3.io>"
+      ]
+    },
+    {
+      "originalRef": "omnilux-review-call-0723",
+      "kind": "meeting",
+      "title": "Omnilux review call",
+      "path": "meetings/2026-07-23-omnilux-review-call.md",
+      "occurredAt": "2026-07-23T14:00:00+01:00",
+      "author": "Granola",
+      "participants": [
+        "Rob Aitken <rob@aisle3.io>",
+        "Sarah Lin <sarah.lin@omnilux.io>",
+        "Daniel Okafor <daniel.okafor@omnilux.io>"
+      ]
+    },
+    {
+      "originalRef": "7f21c9-omnilux-pricing-0723@mail.omnilux.io",
+      "kind": "email",
+      "title": "Re: Omnilux — proposal attached",
+      "path": "emails/2026-07-23-sarah-pricing-breakdown-request.eml",
+      "occurredAt": "2026-07-23T16:41:52+01:00",
+      "author": "Sarah Lin <sarah.lin@omnilux.io>",
+      "participants": [
+        "Sarah Lin <sarah.lin@omnilux.io>",
+        "Rob Aitken <rob@aisle3.io>"
+      ]
+    },
+    {
+      "originalRef": "CAF8x1-omnilux-prop-0723b@mail.aisle3.io",
+      "kind": "email",
+      "title": "Re: Omnilux — proposal attached",
+      "path": "emails/2026-07-23-rob-promises-revised-proposal.eml",
+      "occurredAt": "2026-07-23T18:05:17+01:00",
+      "author": "Rob Aitken <rob@aisle3.io>",
+      "participants": [
+        "Rob Aitken <rob@aisle3.io>",
+        "Sarah Lin <sarah.lin@omnilux.io>"
+      ]
+    },
+    {
+      "originalRef": "a3-internal-0724-goals@mail.aisle3.io",
+      "kind": "email",
+      "title": "August Goals — tagged you on the homepage redesign brief",
+      "path": "emails/2026-07-24-jack-august-goals.eml",
+      "occurredAt": "2026-07-24T14:02:33+01:00",
+      "author": "Jack Mwangi <jack@aisle3.io>",
+      "participants": [
+        "Jack Mwangi <jack@aisle3.io>",
+        "Rob Aitken <rob@aisle3.io>",
+        "Priya Raman <priya@aisle3.io>"
+      ]
+    },
+    {
+      "originalRef": "note-launch-gsi-status-0725",
+      "kind": "note",
+      "title": "Launch GSI — status",
+      "path": "notes/2026-07-25-launch-gsi-status.md",
+      "occurredAt": "2026-07-25T17:00:00+01:00",
+      "author": "Rob Aitken <rob@aisle3.io>",
+      "participants": ["Rob Aitken <rob@aisle3.io>"]
+    },
+    {
+      "originalRef": "note-greenleaf-first-call-0721",
+      "kind": "note",
+      "title": "GreenLeaf Systems — first call",
+      "path": "notes/2026-07-21-greenleaf-first-call.md",
+      "occurredAt": "2026-07-21T11:30:00+01:00",
+      "author": "Rob Aitken <rob@aisle3.io>",
+      "participants": [
+        "Rob Aitken <rob@aisle3.io>",
+        "Nadia Hoque <nadia@greenleaf.systems>"
+      ]
+    },
+    {
+      "originalRef": "note-weekly-review-0727",
+      "kind": "note",
+      "title": "Weekly review — Monday 27 July 2026",
+      "path": "notes/2026-07-27-weekly-review.md",
+      "occurredAt": "2026-07-27T08:30:00+01:00",
+      "author": "Rob Aitken <rob@aisle3.io>",
+      "participants": ["Rob Aitken <rob@aisle3.io>"]
+    },
+    {
+      "originalRef": "rv-proc-2291-0727@mail.revolt.inc",
+      "kind": "email",
+      "title": "SOW v2 — anything I can do to speed this up?",
+      "path": "emails/2026-07-27-david-chasing-sow.eml",
+      "occurredAt": "2026-07-27T11:23:40+01:00",
+      "author": "David Reyes <d.reyes@revolt.inc>",
+      "participants": [
+        "David Reyes <d.reyes@revolt.inc>",
+        "Rob Aitken <rob@aisle3.io>",
+        "Mike Banner <m.banner@revolt.inc>"
+      ]
+    },
+    {
+      "originalRef": "bp-0728-annie-verbal@mail.basepoint.co",
+      "kind": "email",
+      "title": "Re: Basepoint — where we landed",
+      "path": "emails/2026-07-28-annie-basepoint-verbal-yes.eml",
+      "occurredAt": "2026-07-28T08:47:11+01:00",
+      "author": "Annie Zhang <annie.zhang@basepoint.co>",
+      "participants": [
+        "Annie Zhang <annie.zhang@basepoint.co>",
+        "Rob Aitken <rob@aisle3.io>"
+      ]
+    },
+    {
+      "originalRef": "deck-aisle3-services-v4",
+      "kind": "doc",
+      "title": "Aisle3 — Services and Engagement Model",
+      "path": "docs/aisle3-services-deck.md",
+      "occurredAt": "2026-06-12T09:00:00+01:00",
+      "author": "Rob Aitken <rob@aisle3.io>",
+      "participants": []
+    },
+    {
+      "originalRef": "crm-export-companies-0728",
+      "kind": "crm",
+      "title": "CRM export — companies",
+      "path": "crm/companies.csv",
+      "occurredAt": "2026-07-28T23:00:00+01:00",
+      "author": "CRM export",
+      "participants": []
+    },
+    {
+      "originalRef": "crm-export-people-0728",
+      "kind": "crm",
+      "title": "CRM export — people",
+      "path": "crm/people.csv",
+      "occurredAt": "2026-07-28T23:00:00+01:00",
+      "author": "CRM export",
+      "participants": []
+    },
+    {
+      "originalRef": "crm-export-opportunities-0728",
+      "kind": "crm",
+      "title": "CRM export — opportunities",
+      "path": "crm/opportunities.csv",
+      "occurredAt": "2026-07-28T23:00:00+01:00",
+      "author": "CRM export",
+      "participants": []
+    }
+  ]
+}

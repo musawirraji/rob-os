@@ -1,0 +1,104 @@
+{
+  "people": [
+    {
+      "name": "Sarah Lin",
+      "role": "Head of Operations",
+      "companyName": "Omnilux",
+      "email": "sarah.lin@omnilux.io",
+      "quote": "Email: sarah.lin@omnilux.io",
+      "factType": "direct_source_fact",
+      "confidence": 0.98
+    },
+    {
+      "name": "Daniel Okafor",
+      "role": "Finance Director",
+      "companyName": "Omnilux",
+      "email": "daniel.okafor@omnilux.io",
+      "quote": "Email: daniel.okafor@omnilux.io",
+      "factType": "direct_source_fact",
+      "confidence": 0.98
+    },
+    {
+      "name": "Mike Banner",
+      "role": "Senior Product Manager",
+      "companyName": "Revolt Inc",
+      "email": "m.banner@revolt.inc",
+      "quote": "Email: m.banner@revolt.inc",
+      "factType": "direct_source_fact",
+      "confidence": 0.98
+    },
+    {
+      "name": "David Reyes",
+      "role": "Procurement",
+      "companyName": "Revolt Inc",
+      "email": "d.reyes@revolt.inc",
+      "quote": "Email: d.reyes@revolt.inc",
+      "factType": "direct_source_fact",
+      "confidence": 0.98
+    },
+    {
+      "name": "Annie Zhang",
+      "role": "Director of Operations",
+      "companyName": "Basepoint",
+      "email": "annie.zhang@basepoint.co",
+      "quote": "Email: annie.zhang@basepoint.co",
+      "factType": "direct_source_fact",
+      "confidence": 0.98
+    },
+    {
+      "name": "Nadia Hoque",
+      "role": "Chief Operating Officer",
+      "companyName": "GreenLeaf Systems",
+      "email": "nadia@greenleaf.systems",
+      "quote": "Email: nadia@greenleaf.systems",
+      "factType": "direct_source_fact",
+      "confidence": 0.98
+    }
+  ],
+  "companies": [
+    {
+      "name": "Omnilux",
+      "industry": null,
+      "quote": "Company: Omnilux",
+      "factType": "direct_source_fact",
+      "confidence": 0.95
+    },
+    {
+      "name": "Revolt Inc",
+      "industry": null,
+      "quote": "Company: Revolt Inc",
+      "factType": "direct_source_fact",
+      "confidence": 0.95
+    },
+    {
+      "name": "Basepoint",
+      "industry": null,
+      "quote": "Company: Basepoint",
+      "factType": "direct_source_fact",
+      "confidence": 0.95
+    },
+    {
+      "name": "GreenLeaf Systems",
+      "industry": null,
+      "quote": "Company: GreenLeaf Systems",
+      "factType": "direct_source_fact",
+      "confidence": 0.95
+    }
+  ],
+  "projects": [],
+  "commitments": [],
+  "tasks": [],
+  "decisions": [],
+  "risks": [
+    {
+      "description": "Daniel Okafor controls the Omnilux budget line and objects to the rolling monthly support model.",
+      "subject": "Omnilux",
+      "quote": "Controls the budget line. Objects to rolling monthly support, not to the work.",
+      "factType": "direct_source_fact",
+      "confidence": 0.9
+    }
+  ],
+  "openQuestions": [],
+  "sentiment": "neutral",
+  "gist": "CRM contact export covering the Omnilux, Revolt, Basepoint and GreenLeaf relationships."
+}

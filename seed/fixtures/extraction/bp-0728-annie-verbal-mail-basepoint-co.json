@@ -1,0 +1,77 @@
+{
+  "people": [
+    {
+      "name": "Annie Zhang",
+      "role": "Director of Operations",
+      "companyName": "Basepoint",
+      "email": "annie.zhang@basepoint.co",
+      "quote": "From: Annie Zhang <annie.zhang@basepoint.co>",
+      "factType": "direct_source_fact",
+      "confidence": 0.97
+    },
+    {
+      "name": "Terrence",
+      "role": null,
+      "companyName": "Basepoint",
+      "email": null,
+      "quote": "I took it to Terrence yesterday",
+      "factType": "extracted",
+      "confidence": 0.86
+    }
+  ],
+  "companies": [
+    {
+      "name": "Basepoint",
+      "industry": null,
+      "quote": "Basepoint engagement at the £45,000 figure",
+      "factType": "direct_source_fact",
+      "confidence": 0.96
+    }
+  ],
+  "projects": [],
+  "commitments": [
+    {
+      "owedBy": "Annie Zhang",
+      "owedTo": "principal",
+      "what": "Send the PO reference once it is raised",
+      "deadline": null,
+      "commitmentType": "waiting",
+      "quote": "I'll send the PO reference once it's raised.",
+      "factType": "direct_source_fact",
+      "confidence": 0.93
+    }
+  ],
+  "tasks": [],
+  "decisions": [
+    {
+      "statement": "Basepoint gave a verbal yes to the engagement at £45,000, starting in September rather than August",
+      "decisionMaker": "Terrence",
+      "rationale": null,
+      "alternatives": [
+        "Start in August as originally proposed"
+      ],
+      "reversible": false,
+      "quote": "we have a verbal yes on the",
+      "factType": "direct_source_fact",
+      "confidence": 0.94,
+      "peopleInvolved": [
+        "Annie Zhang",
+        "Terrence"
+      ]
+    }
+  ],
+  "risks": [
+    {
+      "description": "Paperwork will take a couple of weeks because Basepoint's legal team is thin in August.",
+      "subject": "Basepoint",
+      "quote": "our legal team is thin in August",
+      "factType": "direct_source_fact",
+      "confidence": 0.88
+    }
+  ],
+  "openQuestions": [
+    "When will the PO reference actually be raised?"
+  ],
+  "sentiment": "positive",
+  "gist": "Basepoint gave a verbal yes at £45,000 with a September start; paperwork is pending."
+}

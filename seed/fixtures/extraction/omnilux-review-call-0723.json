@@ -1,0 +1,98 @@
+{
+  "people": [
+    {
+      "name": "Sarah Lin",
+      "role": "Head of Operations",
+      "companyName": "Omnilux",
+      "email": null,
+      "quote": "**Attendees:** Rob Aitken (Aisle3), Sarah Lin (Omnilux), Daniel Okafor (Omnilux, Finance)",
+      "factType": "direct_source_fact",
+      "confidence": 0.96
+    },
+    {
+      "name": "Daniel Okafor",
+      "role": "Finance",
+      "companyName": "Omnilux",
+      "email": null,
+      "quote": "**Attendees:** Rob Aitken (Aisle3), Sarah Lin (Omnilux), Daniel Okafor (Omnilux, Finance)",
+      "factType": "direct_source_fact",
+      "confidence": 0.96
+    },
+    {
+      "name": "Sarah",
+      "role": null,
+      "companyName": "Omnilux",
+      "email": null,
+      "quote": "**Sarah:** Can we also see it split by tier?",
+      "factType": "extracted",
+      "confidence": 0.7
+    }
+  ],
+  "companies": [
+    {
+      "name": "Omnilux",
+      "industry": null,
+      "quote": "# Omnilux review call",
+      "factType": "direct_source_fact",
+      "confidence": 0.97
+    }
+  ],
+  "projects": [],
+  "commitments": [
+    {
+      "owedBy": "principal",
+      "owedTo": "Sarah Lin",
+      "what": "Break out build, integration and support as separate lines in the proposal",
+      "deadline": null,
+      "commitmentType": "explicit",
+      "quote": "Yes. I'll break out build, integration and support as separate lines.",
+      "factType": "direct_source_fact",
+      "confidence": 0.93
+    }
+  ],
+  "tasks": [
+    {
+      "description": "Restructure the support line as annual paid up front, or fold the first year into the build number",
+      "owner": "principal",
+      "dueDate": null,
+      "priority": "high",
+      "projectName": null,
+      "quote": "I can restructure that. Annual, paid up front",
+      "factType": "extracted",
+      "confidence": 0.55
+    }
+  ],
+  "decisions": [
+    {
+      "statement": "Leave the Northwind migration inside scope for now rather than pre-cutting it",
+      "decisionMaker": "Daniel Okafor",
+      "rationale": "Daniel did not want to cut it before the transformation budget had been asked for",
+      "alternatives": [
+        "Remove the Northwind migration from scope to reduce the total"
+      ],
+      "reversible": true,
+      "quote": "Leave it in for now.",
+      "factType": "direct_source_fact",
+      "confidence": 0.91,
+      "peopleInvolved": [
+        "Sarah Lin",
+        "Daniel Okafor"
+      ]
+    }
+  ],
+  "risks": [
+    {
+      "description": "Omnilux does not have the £82,000 approved. Only £60,000 is approved, on the operations line, and the transformation budget has not been asked for.",
+      "subject": "Omnilux",
+      "quote": "Then the honest position is we don't have eighty-two approved.",
+      "factType": "direct_source_fact",
+      "confidence": 0.94
+    }
+  ],
+  "openQuestions": [
+    "Will the transformation budget be granted once Sarah asks for it?",
+    "Which other vendors, if any, is Omnilux considering?"
+  ],
+  "sentiment": "tense",
+  "gist": "Review call where Omnilux's finance director confirmed the £82,000 is not approved and objected to the rolling monthly support model, while remaining positive on the work itself."
+}

@@ -1,0 +1,26 @@
+{
+  "_comment": "Hand-written living summaries used ONLY by `--fixtures` runs, keyed by kind and name. A live run (with ANTHROPIC_API_KEY set) ignores this file entirely and Claude writes these from the stored excerpts. They exist so a fixture-mode demo shows realistic records instead of placeholder text — they are demo data in the same category as the fictional emails, not model output. Each one is true to the corpus and follows the rules in domain/prompts.ts: lead with what is outstanding, name the tension, no advice.",
+
+  "person": {
+    "Sarah Lin": "Sarah is the buyer on the Omnilux engagement and has gone quiet — her last message was six days ago, asking for the £82,000 broken out by service tier because her finance team will not sign off a single blended figure. You owe her that revised proposal; you said Friday and it has not gone. The commercial terms expire on 31 July, and she is away for most of next week.",
+    "Daniel Okafor": "Omnilux's finance director, and the person who decides whether this closes. He was positive on the work itself but stated plainly that the £82,000 is not approved — only £60,000 on the operations line, with the transformation budget not yet asked for. His specific objection is the rolling monthly support model, not the total: it is opex forever and does not fit a capex approval. He asked for annual up front instead.",
+    "Mike Banner": "Senior PM at Revolt Inc and the day-to-day owner of the engagement. You promised him a revised SOW at the planning call on 23 July and it is now two days past. He is expanding design support for two Q4 launches and wants two to three more people from September. He is not comfortable defending the rate internally yet — his stated reason is that he cannot see it line by line, not that the total is wrong.",
+    "David Reyes": "Procurement at Revolt Inc, chasing on Mike's behalf. He cannot open the Aisle3 vendor record until the revised SOW lands, and warned that missing this week's legal intake pushes the engagement into the August intake and a September start. He has offered to turn his side around the same day it arrives.",
+    "Annie Zhang": "Basepoint's director of operations and the one relationship currently doing your selling for you. She took the renewal to Terrence and came back with a verbal yes at £45,000, moving the start to September. She owes you the PO reference once it is raised, and flagged that paperwork will take a couple of weeks because their legal team is thin in August.",
+    "Terrence": "Named as the Basepoint approver who gave the verbal yes at £45,000 and asked for a September start rather than August. Everything recorded about him is second-hand through Annie Zhang; there is no direct correspondence in the corpus.",
+    "Nadia Hoque": "COO at GreenLeaf Systems, a new prospect introduced by Kestrel. On the first call she was direct about the problem — three systems, none authoritative, and a reporting layer maintained by hand every Monday — and about having been burned by a vendor who took eight months on a three-month scope. Budget was raised and then moved past. No commitments were made on either side."
+  },
+
+  "company": {
+    "Omnilux": "An £82,000 proposal is live and the terms expire on 31 July. Budget is the blocker rather than fit: only £60,000 is approved, on the operations line, and the transformation budget has not been asked for. Finance objects to the rolling monthly support model specifically. The revised tier-by-tier proposal you promised on 23 July has not been sent, and the buyer is away most of next week.",
+    "Revolt Inc": "A live client expanding for two Q4 launches, wanting two to three additional design people from September. The engagement is effectively agreed and held up by one document: the revised SOW, promised on 23 July and still outstanding. Procurement cannot open the vendor record without it, and missing this week's legal intake means a September start.",
+    "Basepoint": "A verbal yes at £45,000 for a September start, taken to the approver by Annie Zhang on 28 July. Paperwork is expected to take a couple of weeks because their legal team is thin in August. This is the one account where the client is driving rather than being chased.",
+    "GreenLeaf Systems": "A new prospect from a Kestrel introduction, one call in. They run soil and yield telemetry for around four hundred farms across three systems with no authoritative source, and the immediate pain is a manual Monday reporting cycle. They have been burned by a vendor overrunning badly before. No scope, no budget discussed, and no commitments on either side."
+  },
+
+  "project": {},
+
+  "meeting": {
+    "Omnilux review call": "The call where the budget position became explicit: Omnilux does not have the £82,000 approved, only £60,000 on the operations line, and the transformation budget had not been asked for. Finance was positive on the work but pushed back on the rolling monthly support model as opex that cannot sit in a capex approval. Two things were agreed — the proposal would be split by tier, and the Northwind migration stays in scope for now rather than being pre-cut."
+  }
+}

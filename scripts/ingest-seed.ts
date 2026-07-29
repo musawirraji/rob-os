@@ -181,9 +181,27 @@ async function main(): Promise<void> {
         })
     : async (texts: string[]) => embed(texts, "document");
 
+  // Hand-written summaries for fixture runs, so a keyless demo shows realistic
+  // records rather than placeholder text. A live run ignores this entirely.
+  let fixtureSummaries: Record<string, Record<string, string>> = {};
+  if (useFixtures) {
+    try {
+      fixtureSummaries = JSON.parse(
+        await readFile(path.join(SEED_DIR, "fixtures", "summaries.json"), "utf8"),
+      );
+    } catch {
+      console.warn("No seed/fixtures/summaries.json — records will have no summary.");
+    }
+  }
+
   const summarise = useFixtures
-    ? async (subject: { kind: string; name: string }) =>
-        `[fixture] Living summary for ${subject.kind} ${subject.name}.`
+    ? async (subject: { kind: string; name: string }) => {
+        const written = fixtureSummaries[subject.kind]?.[subject.name];
+        // No hand-written summary means no summary. Inventing one here would put
+        // text on screen that nothing in the corpus supports.
+        if (!written) return null;
+        return written;
+      }
     : summariseWithClaude;
 
   if (!useFixtures) {

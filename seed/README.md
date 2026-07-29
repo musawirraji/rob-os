@@ -138,6 +138,12 @@ Five sources have fixtures, chosen to cover the paths that matter:
 | `bp-0728-annie-verbal-…` | A decision with a named decision-maker created from the same source |
 | `crm-export-people-0728` | Six people and four companies, all resolving onto existing rows — this is the run that shows resolution converging rather than duplicating |
 
+Living summaries in fixture mode come from `seed/fixtures/summaries.json` — they are
+**hand-written demo data**, in the same category as the fictional emails, not model
+output. Each one is true to the corpus. An entity with no entry gets no summary rather
+than an invented one. A live run ignores that file completely and Claude writes the
+summaries from the stored excerpts.
+
 **A fixture run is not a retrieval test.** The embeddings it writes are
 deterministic hashes, not Voyage vectors — they exercise the pgvector write path
 and the index, and mean nothing semantically. Full-text retrieval over the real

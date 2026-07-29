@@ -13,7 +13,8 @@
     "db:types": "supabase gen types typescript --local --schema public > src/shared/interfaces/database.types.ts",
     "seed:ingest": "tsx --conditions=react-server scripts/ingest-seed.ts",
     "ask:test": "tsx --conditions=react-server scripts/ask-acceptance.ts",
-    "verify": "tsx --conditions=react-server scripts/verify-engine.ts"
+    "verify": "tsx --conditions=react-server scripts/verify-engine.ts",
+    "db:bundle": "bash scripts/bundle-migrations.sh"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.115.0",

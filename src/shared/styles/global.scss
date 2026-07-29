@@ -1792,3 +1792,22 @@ a.ro-brief__row:hover {
   text-overflow: ellipsis;
   white-space: nowrap;
 }
+
+.ro-login__divider {
+  display: flex;
+  align-items: center;
+  gap: $ro-space-3;
+  margin: $ro-space-2 0;
+  font-size: $ro-fs-micro;
+  text-transform: uppercase;
+  letter-spacing: $ro-tracking-eyebrow;
+  color: var(--ro-muted);
+
+  &::before,
+  &::after {
+    content: "";
+    flex: 1;
+    height: 1px;
+    background: var(--ro-line);
+  }
+}

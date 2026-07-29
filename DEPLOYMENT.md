@@ -119,13 +119,47 @@ whenever Today is opened, so nothing breaks, it just is not pre-warmed.
 accounts**. Only people you add can get in, and an unknown address gets a deliberately
 vague failure rather than confirmation that it is not registered.
 
-So to let someone in:
+### The mailbox problem
 
-1. Authentication → Users → **Add user**, with their email (tick auto-confirm).
-2. They visit the app, enter that address, and get a sign-in link.
+A magic link is worthless to someone who does not control the inbox it goes to.
+Sending a reviewer a link addressed to `rob@aisle3.io` gives them nothing. There are
+three ways round it, in order of how well they suit a review.
 
-One thing to decide before you do it: **a reviewer with no workspace sees empty
-screens.** A workspace row is tied to one `owner_user_id`, so a second user is not
+**1. A password on the demo account — recommended.**
+
+The login screen accepts a password as well as a link, precisely so access can be
+granted to an inbox you do not own. You set the password; the app only verifies one.
+
+Authentication → Users → `rob@aisle3.io` → **Reset password** (or Add user with a
+password). Then send the reviewer the address and password. They sign in whenever they
+like, as many times as they like, and see the full seeded corpus because they are
+signing in *as the workspace owner*.
+
+Use a throwaway password and rotate it after the review.
+
+**2. A one-off link you generate yourself.**
+
+Authentication → Users → the user → **Generate link**, or:
+
+```bash
+curl -X POST "$SUPABASE_URL/auth/v1/admin/generate_link" \
+  -H "apikey: $SERVICE_ROLE_KEY" -H "Authorization: Bearer $SERVICE_ROLE_KEY" \
+  -H "content-type: application/json" \
+  -d '{"type":"magiclink","email":"rob@aisle3.io","redirect_to":"https://your-app.vercel.app/auth/callback"}'
+```
+
+Paste the returned link to the reviewer. `/auth/callback` handles this shape
+(`token_hash`) as well as the app's own PKCE links, and because there is no code
+verifier involved it works in **any** browser — which is what makes it useful here, and
+also why it is single-use and expires within the hour. Good for a scheduled walkthrough,
+not for "have a look whenever".
+
+**3. Their own account.** Add their email as a user and they get their own link. But see
+the workspace note below — on its own this shows them an empty app.
+
+### If the reviewer signs in as themselves
+
+**A user with no workspace sees empty screens.** A workspace row is tied to one `owner_user_id`, so a second user is not
 looking at the seeded corpus — they are looking at nothing. Two options:
 
 - **Simplest for review:** repoint the existing workspace at their user id after they

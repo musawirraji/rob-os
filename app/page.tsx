@@ -1,66 +1,26 @@
-import Image from "next/image";
-import styles from "./page.module.css";
+import { TodayScreen, loadTodayScreen } from "@features/today";
+import { EmptyState } from "@shared/components/primitives";
+import { Screen } from "@shared/components/Screen";
+import { routes } from "@shared/navigation/routes";
 
-export default function Home() {
+/**
+ * Every screen reads the live workspace, so none may be prerendered. Without this
+ * the brief freezes at build time and silently serves yesterday's state.
+ */
+export const dynamic = "force-dynamic";
+
+export default function Page() {
   return (
-    <div className={styles.page}>
-      <main className={styles.main}>
-        <Image
-          className={styles.logo}
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className={styles.intro}>
-          <h1>To get started, edit the page.tsx file.</h1>
-          <p>
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              Learning
-            </a>{" "}
-            center.
-          </p>
-        </div>
-        <div className={styles.ctas}>
-          <a
-            className={styles.primary}
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className={styles.logo}
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={16}
-            />
-            Deploy Now
-          </a>
-          <a
-            className={styles.secondary}
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
-        </div>
-      </main>
-    </div>
+    <Screen
+      activePath={routes.today()}
+      render={async ({ db, workspaceId }) => {
+        const state = await loadTodayScreen(db, workspaceId);
+        return state ? (
+          <TodayScreen state={state} />
+        ) : (
+          <EmptyState title="Nothing to show" body="The workspace could not be loaded." />
+        );
+      }}
+    />
   );
 }

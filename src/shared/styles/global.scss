@@ -1793,21 +1793,543 @@ a.ro-brief__row:hover {
   white-space: nowrap;
 }
 
-.ro-login__divider {
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Motion, skeletons and busy states
+//
+// The brief for motion here is the same as the brief for colour: it earns its
+// place or it does not appear. This is a tool someone opens forty times a day, so
+// every duration is short, nothing bounces, nothing slides in from off-screen, and
+// nothing loops except while genuinely waiting on the network.
+//
+// One rule throughout: **the resting state is the visible state.** Every entrance
+// animates *from* hidden rather than starting hidden and being revealed, so if an
+// animation is ever skipped the content is still there. The global
+// prefers-reduced-motion block above collapses all of these to ~0ms, which lands
+// on the final frame — so honouring that preference needs nothing extra here.
+// ─────────────────────────────────────────────────────────────────────────────
+
+@keyframes ro-rise {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+}
+
+// The `to` is explicit on purpose. With only a `from`, the implied end state is the
+// element's *own* opacity — so anything whose resting opacity is 0 animated 0 → 0
+// and never appeared at all. Spelling out both ends makes the keyframe mean the
+// same thing wherever it is used.
+@keyframes ro-fade {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+// Reveal is handled by a transition wherever an element rests at opacity 0, so the
+// looping animation is free to own a different property. Two animations competing
+// for opacity is what caused the bug above.
+@keyframes ro-throb {
+  50% {
+    transform: scale(0.5);
+  }
+}
+
+@keyframes ro-pop {
+  from {
+    opacity: 0;
+    transform: translateY(-6px) scale(0.985);
+  }
+}
+
+@keyframes ro-sweep {
+  to {
+    transform: translateX(100%);
+  }
+}
+
+@keyframes ro-spin {
+  to {
+    transform: rotate(1turn);
+  }
+}
+
+@keyframes ro-breathe {
+  50% {
+    opacity: 0.4;
+  }
+}
+
+// ── Screen entrance ──────────────────────────────────────────────────────────
+// The content area is the only thing that changes on a navigation, so it is the
+// only thing that animates. The shell staying perfectly still is what makes the
+// transition read as fast rather than busy.
+
+.ro-content > * {
+  animation: ro-rise var(--ro-dur-base) var(--ro-ease) both;
+}
+
+// ── Staggered rows ───────────────────────────────────────────────────────────
+// A small cascade, capped at ten. Past that the delay would be longer than the
+// data took to arrive, and a list that fills in slowly on purpose is just slow.
+
+.ro-list__row,
+.ro-brief__row,
+.ro-feed__row,
+.ro-sk-list__row,
+.ro-sk-brief__row {
+  animation: ro-fade var(--ro-dur-base) var(--ro-ease) both;
+
+  @for $i from 1 through 10 {
+    &:nth-child(#{$i}) {
+      animation-delay: #{($i - 1) * 22}ms;
+    }
+  }
+}
+
+// Rows are interactive, so the hover needs to settle rather than snap.
+.ro-list__row,
+.ro-brief__row,
+.ro-feed__row {
+  transition: background var(--ro-dur-fast) var(--ro-ease);
+}
+
+// ── Tabs ─────────────────────────────────────────────────────────────────────
+// The hairline grows from the centre instead of appearing. Still a hairline, not
+// a coloured bar — the design's rule, just with a beginning.
+
+.ro-tabs__tab {
+  position: relative;
+  transition: color var(--ro-dur-fast) var(--ro-ease);
+
+  &.is-active::after {
+    content: "";
+    position: absolute;
+    inset: auto 0 -1px;
+    height: 1px;
+    background: var(--ro-ink);
+    animation: ro-tab-underline var(--ro-dur-base) var(--ro-ease) both;
+  }
+}
+
+@keyframes ro-tab-underline {
+  from {
+    transform: scaleX(0);
+  }
+}
+
+// ── Command palette ──────────────────────────────────────────────────────────
+
+.ro-palette {
+  animation: ro-pop var(--ro-dur-base) var(--ro-ease) both;
+}
+
+.ro-palette__catcher {
+  animation: ro-fade var(--ro-dur-fast) var(--ro-ease) both;
+}
+
+.ro-palette__row {
+  transition: background var(--ro-dur-fast) var(--ro-ease);
+}
+
+.ro-palette__spinner {
+  flex: none;
+  margin-left: auto;
+}
+
+// ── Spinner ──────────────────────────────────────────────────────────────────
+// Always rendered, opacity-toggled, fixed size — so switching it on never shifts
+// the layout around it. The fade is delayed so work that finishes quickly never
+// flashes a spinner the user cannot read.
+
+.ro-spinner {
+  display: inline-block;
+  flex: none;
+  width: 13px;
+  height: 13px;
+  border-radius: 50%;
+  border: 1.5px solid currentColor;
+  border-top-color: transparent;
+  opacity: 0;
+  vertical-align: -2px;
+  // The delayed reveal is a transition, leaving the animation to own rotation
+  // alone. It only applies where the element is always mounted and the class
+  // toggles — the palette's, say. A spinner that is rendered only once busy has
+  // nothing to transition from and appears at once, which is right: the user has
+  // just clicked and deserves immediate acknowledgement.
+  transition: opacity var(--ro-dur-fast) var(--ro-ease) 160ms;
+
+  &.is-busy {
+    opacity: 1;
+    animation: ro-spin 640ms linear infinite;
+  }
+}
+
+// ── Nav pending hint ─────────────────────────────────────────────────────────
+// Says *which* row you clicked while the route skeleton says something is loading.
+// Reserved space and a 120ms delay: a prefetched navigation resolves before this
+// is ever visible, which is the intended outcome.
+
+.ro-nav__pending {
+  flex: none;
+  width: 5px;
+  height: 5px;
+  margin-left: 2px;
+  border-radius: 50%;
+  background: currentColor;
+  opacity: 0;
+  transition: opacity var(--ro-dur-fast) var(--ro-ease) 120ms;
+
+  &.is-pending {
+    opacity: 1;
+    animation: ro-throb 1.1s var(--ro-ease) infinite;
+  }
+}
+
+// ── Busy forms ───────────────────────────────────────────────────────────────
+
+.ro-btn {
+  &.is-busy {
+    // Not `disabled`: a disabled button loses its accessible name for some screen
+    // readers mid-announcement. aria-disabled + pointer-events keeps the label.
+    pointer-events: none;
+  }
+
+  &[aria-disabled="true"] {
+    opacity: 0.45;
+    cursor: not-allowed;
+  }
+}
+
+// A card whose action is in flight stops accepting new ones and says so. Without
+// this, a slow approve invites a second click that queues a second write.
+.ro-review.is-busy,
+.ro-capture__form.is-busy {
+  opacity: 0.55;
+  pointer-events: none;
+  transition: opacity var(--ro-dur-base) var(--ro-ease);
+}
+
+// ── Flash messages ───────────────────────────────────────────────────────────
+
+.ro-review__flash,
+.ro-capture__flash {
+  animation: ro-rise var(--ro-dur-slow) var(--ro-ease) both;
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Skeletons
+//
+// Blocks are shaped like the content that replaces them and carry no text, no
+// numbers and no counts — nothing that could be mistaken for data that arrived.
+// The sweep is deliberately low-contrast: it should read as "not ready yet" at a
+// glance and be invisible from across the room.
+// ─────────────────────────────────────────────────────────────────────────────
+
+// The block keeps a solid fill and the sweep rides over it on a pseudo-element,
+// moved by transform. The first version animated `background-position` in
+// percentages against an oversized gradient — and because percentage background
+// positions resolve against (container − image) width, which is negative when the
+// image is wider than the box, the gradient travelled the wrong way and left the
+// element entirely. The blocks disappeared for part of every cycle. A transform on
+// an overlay cannot do that: the fill underneath is always there.
+.ro-sk {
+  display: block;
+  flex: none;
+  position: relative;
+  overflow: hidden;
+  background: var(--ro-surface-3);
+
+  &::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    // Low contrast on purpose: "not ready yet" at a glance, invisible from across
+    // the room. A brighter sweep turns a loading list into the liveliest thing on
+    // screen, which is backwards.
+    background: linear-gradient(
+      90deg,
+      rgba(255, 255, 255, 0) 0%,
+      rgba(255, 255, 255, 0.55) 50%,
+      rgba(255, 255, 255, 0) 100%
+    );
+    transform: translateX(-100%);
+    animation: ro-sweep 1.5s ease-in-out infinite;
+  }
+}
+
+.ro-sk-screen {
+  display: flex;
+  flex-direction: column;
+  gap: $ro-space-2;
+}
+
+// A spacer, so the skeletons can express rhythm without a wrapper per gap.
+.ro-sk-gap {
+  height: $ro-space-2;
+}
+
+.ro-sk-screen > .ro-card {
+  margin-top: $ro-space-3;
+}
+
+// Consecutive blocks standing in for wrapped text need the leading that real text
+// would have. Without it three stacked lines read as one solid slab.
+.ro-card > .ro-sk + .ro-sk {
+  margin-top: 7px;
+}
+
+// ── Skeleton rows ────────────────────────────────────────────────────────────
+
+.ro-sk-list__row,
+.ro-sk-brief__row {
   display: flex;
   align-items: center;
   gap: $ro-space-3;
-  margin: $ro-space-2 0;
-  font-size: $ro-fs-micro;
-  text-transform: uppercase;
-  letter-spacing: $ro-tracking-eyebrow;
-  color: var(--ro-muted);
+  padding: $ro-space-3 $ro-space-5;
+  border-bottom: 1px solid var(--ro-line-2);
 
-  &::before,
-  &::after {
+  &:last-child {
+    border-bottom: 0;
+  }
+}
+
+.ro-sk-list__body {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+// ── Today skeleton ───────────────────────────────────────────────────────────
+
+.ro-sk-stats {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: $ro-space-3;
+  margin: $ro-space-4 0 0;
+
+  @media (min-width: $ro-bp-md) {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+.ro-sk-stat {
+  display: flex;
+  flex-direction: column;
+  gap: $ro-space-2;
+  padding: $ro-space-4;
+  background: var(--ro-surface);
+  border: 1px solid var(--ro-line);
+  border-radius: var(--ro-radius);
+}
+
+// ── Object skeleton ──────────────────────────────────────────────────────────
+
+.ro-sk-object {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: $ro-space-5;
+
+  @media (min-width: $ro-bp-lg) {
+    grid-template-columns: var(--ro-panel-w) 1fr;
+    align-items: start;
+  }
+}
+
+.ro-sk-detail {
+  display: flex;
+  flex-direction: column;
+  gap: $ro-space-3;
+  padding: $ro-space-5;
+  background: var(--ro-surface);
+  border: 1px solid var(--ro-line);
+  border-radius: var(--ro-radius);
+}
+
+.ro-sk-detail__actions {
+  display: flex;
+  gap: $ro-space-2;
+}
+
+.ro-sk-detail__facts {
+  display: flex;
+  flex-direction: column;
+  gap: $ro-space-3;
+  padding-top: $ro-space-3;
+  border-top: 1px solid var(--ro-line-2);
+}
+
+.ro-sk-detail__fact {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.ro-sk-main {
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: $ro-space-4;
+
+  > .ro-card {
+    margin-top: 0;
+  }
+}
+
+// Mirrors `.ro-tabs`, including its horizontal scroll. Without that the four tab
+// blocks are wider than a 360px column and push the page sideways — the skeleton
+// has to obey the same overflow guard as the thing it stands in for.
+.ro-sk-tabs {
+  display: flex;
+  gap: $ro-space-4;
+  padding-bottom: $ro-space-3;
+  border-bottom: 1px solid var(--ro-line);
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+.ro-sk-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: $ro-space-2;
+}
+
+// ── Ask skeleton ─────────────────────────────────────────────────────────────
+// Names the three stages that will run rather than drawing a progress bar whose
+// position would be invented. On the one screen built around not overclaiming,
+// a fake percentage would be the wrong first impression.
+
+.ro-sk-ask {
+  padding: $ro-space-6;
+  background: var(--ro-surface);
+  border: 1px solid var(--ro-line);
+  border-radius: var(--ro-radius);
+}
+
+.ro-sk-ask__lead {
+  display: flex;
+  align-items: center;
+  gap: $ro-space-2;
+  margin: 0;
+  font-size: $ro-fs-base;
+  font-weight: $ro-fw-medium;
+  color: var(--ro-ink);
+}
+
+.ro-sk-ask__stages {
+  margin: $ro-space-4 0 0;
+  padding: 0;
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: $ro-space-2;
+
+  li {
+    display: flex;
+    align-items: center;
+    gap: $ro-space-2;
+    font-size: $ro-fs-sm;
+    color: var(--ro-ink-2);
+    animation: ro-breathe 1.8s var(--ro-ease) infinite;
+
+    // Offset so the three read as one slow sweep down the list. No stage is
+    // marked done or current — the server does not report that, so neither does
+    // this.
+    @for $i from 1 through 3 {
+      &:nth-child(#{$i}) {
+        animation-delay: #{($i - 1) * 220}ms;
+      }
+    }
+
+    &::before {
+      content: "";
+      flex: none;
+      width: 4px;
+      height: 4px;
+      border-radius: 50%;
+      background: var(--ro-muted);
+    }
+  }
+}
+
+.ro-sk-ask__note {
+  margin: $ro-space-4 0 0;
+  font-size: $ro-fs-xs;
+  color: var(--ro-muted);
+}
+
+// ── Capture skeleton ─────────────────────────────────────────────────────────
+
+.ro-sk-capture {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: $ro-space-4;
+
+  @media (min-width: $ro-bp-lg) {
+    grid-template-columns: 1fr 1fr;
+    align-items: start;
+  }
+}
+
+.ro-sk-capture__form {
+  display: flex;
+  flex-direction: column;
+  gap: $ro-space-3;
+  padding: $ro-space-5;
+}
+
+// ── Fieldset wrapper ─────────────────────────────────────────────────────────
+// `BusyFields` uses a real <fieldset> so the browser disables the whole group
+// natively. It must therefore carry none of a fieldset's default chrome.
+
+.ro-fields {
+  min-width: 0;
+  margin: 0;
+  padding: 0;
+  border: 0;
+
+  &.is-busy {
+    opacity: 0.6;
+    transition: opacity var(--ro-dur-base) var(--ro-ease);
+  }
+}
+
+// The capture and login forms are laid out *by* the fieldset, so it inherits the
+// flex column those classes describe.
+.ro-fields.ro-capture__form,
+.ro-fields.ro-login__form {
+  display: flex;
+  flex-direction: column;
+}
+
+// ── Ask working state ────────────────────────────────────────────────────────
+
+.ro-ask__form.is-busy .ro-ask__input {
+  color: var(--ro-ink-2);
+}
+
+.ro-ask__working {
+  display: flex;
+  align-items: center;
+  gap: $ro-space-2;
+  margin: $ro-space-3 0 0;
+  font-size: $ro-fs-xs;
+  color: var(--ro-ink-2);
+  animation: ro-fade var(--ro-dur-base) var(--ro-ease) 120ms both;
+
+  &::before {
     content: "";
-    flex: 1;
-    height: 1px;
-    background: var(--ro-line);
+    flex: none;
+    width: 13px;
+    height: 13px;
+    border-radius: 50%;
+    border: 1.5px solid currentColor;
+    border-top-color: transparent;
+    animation: ro-spin 640ms linear infinite;
   }
 }

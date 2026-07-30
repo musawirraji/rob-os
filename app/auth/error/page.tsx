@@ -1,3 +1,5 @@
+import Link from "next/link";
+
 import { APP_NAME } from "@shared/constants";
 
 export const dynamic = "force-dynamic";
@@ -23,9 +25,9 @@ export default async function Page({
           {REASONS[reason ?? ""] ?? "Something went wrong with that sign-in link."}
         </p>
         <p className="ro-login__form">
-          <a className="ro-btn ro-btn--primary" href="/login">
+          <Link className="ro-btn ro-btn--primary" href="/login">
             Back to sign in
-          </a>
+          </Link>
         </p>
         <p className="ro-login__note">{APP_NAME}</p>
       </div>

@@ -1,64 +1,30 @@
 import type { ReactNode } from "react";
 
+import Link from "next/link";
+
 import { APP_NAME } from "@shared/constants";
-import { attentionNav, primaryNav } from "@shared/navigation/routes";
 
 import { Icon } from "./Icon";
 import { CommandPaletteTrigger } from "./CommandPaletteTrigger";
+import { SideNav, type ShellCounts } from "./SideNav";
 
 /**
- * The persistent frame: sidebar, search, capture. Server-rendered — only the
- * palette trigger is interactive, so only that piece is a client component.
+ * The persistent frame: sidebar, search, capture.
+ *
+ * This renders in the route-group layout rather than inside each page, which is
+ * what makes navigation feel instant — the sidebar and topbar stay mounted and
+ * interactive while only the content area swaps to its skeleton. Rendering the
+ * shell per page meant every click tore the whole frame down and rebuilt it.
  */
 
-export type ShellCounts = Partial<Record<"inbox" | "projects" | "review", number>>;
-
-function NavList({
-  items,
-  counts,
-  activePath,
-}: {
-  items: typeof primaryNav;
-  counts: ShellCounts;
-  activePath: string;
-}) {
-  return (
-    <ul className="ro-nav">
-      {items.map((item) => {
-        // Exact match for the root, prefix match elsewhere, so /people/:id keeps
-        // People lit.
-        const active =
-          item.href === "/" ? activePath === "/" : activePath.startsWith(item.href);
-        const count = item.countKey ? counts[item.countKey] : undefined;
-
-        return (
-          <li key={item.href}>
-            <a
-              className={`ro-nav__item${active ? " is-active" : ""}`}
-              href={item.href}
-              aria-current={active ? "page" : undefined}
-            >
-              <Icon name={item.icon} size={15} />
-              <span className="ro-nav__label">{item.label}</span>
-              {count !== undefined && count > 0 ? (
-                <span className="ro-nav__count">{count}</span>
-              ) : null}
-            </a>
-          </li>
-        );
-      })}
-    </ul>
-  );
-}
+export type { ShellCounts };
 
 export function AppShell({
   children,
-  activePath,
   counts = {},
   account,
 }: {
   children: ReactNode;
-  activePath: string;
   counts?: ShellCounts;
   /** Signed-in identity and the sign-out action. Absent before auth is wired. */
   account?: { email: string | null; signOut: () => Promise<void> };
@@ -66,21 +32,14 @@ export function AppShell({
   return (
     <div className="ro-shell">
       <aside className="ro-sidebar">
-        <a className="ro-brand" href="/">
+        <Link className="ro-brand" href="/">
           <span className="ro-brand__mark">
             <Icon name="ask" size={14} />
           </span>
           <span className="ro-brand__name">{APP_NAME}</span>
-        </a>
+        </Link>
 
-        <nav aria-label="Primary">
-          <NavList items={primaryNav} counts={counts} activePath={activePath} />
-        </nav>
-
-        <nav aria-label="Attention">
-          <p className="ro-eyebrow ro-sidebar__group">Attention</p>
-          <NavList items={attentionNav} counts={counts} activePath={activePath} />
-        </nav>
+        <SideNav counts={counts} />
 
         {account ? (
           <div className="ro-signout">
@@ -101,10 +60,10 @@ export function AppShell({
       <div className="ro-main">
         <header className="ro-topbar">
           <CommandPaletteTrigger />
-          <a className="ro-btn ro-btn--primary" href="/inbox">
+          <Link className="ro-btn ro-btn--primary" href="/inbox">
             <Icon name="capture" size={14} />
             Capture
-          </a>
+          </Link>
         </header>
         <main className="ro-content">{children}</main>
       </div>

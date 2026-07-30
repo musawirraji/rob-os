@@ -1,5 +1,7 @@
 import "server-only";
 
+import { cache } from "react";
+
 import { getSignedInUser } from "./auth";
 import { getAdminSupabase, type AdminClient } from "./supabase/adminClient";
 
@@ -14,6 +16,10 @@ import { getAdminSupabase, type AdminClient } from "./supabase/adminClient";
  * Returns null when nobody is signed in. `proxy.ts` redirects before that happens
  * on a page request; the null path covers server actions and route handlers, which
  * must not fall back to "some workspace".
+ *
+ * Memoised per request with React `cache`, because the shell layout and the page
+ * inside it both need it. Without this every navigation resolves the user and the
+ * workspace twice — two round trips to show one screen.
  */
 export type WorkspaceContext = {
   db: AdminClient;
@@ -23,7 +29,7 @@ export type WorkspaceContext = {
   userEmail: string | null;
 };
 
-export async function getWorkspaceContext(): Promise<WorkspaceContext | null> {
+export const getWorkspaceContext = cache(async function getWorkspaceContext(): Promise<WorkspaceContext | null> {
   const db = getAdminSupabase();
   if (!db) return null;
 
@@ -55,7 +61,7 @@ export async function getWorkspaceContext(): Promise<WorkspaceContext | null> {
     userId: user.id,
     userEmail: user.email,
   };
-}
+});
 
 /** Counts for the sidebar badges. Cheap head-only queries. */
 export async function getShellCounts(

@@ -2,7 +2,7 @@ import "server-only";
 
 import { completeStructured, completeText } from "@shared/services/llm";
 
-import { EXTRACTION_SCHEMA } from "../domain/extractionSchema";
+import { CLAIM_SCHEMA, ENTITY_SCHEMA } from "../domain/extractionSchema";
 import {
   EXTRACTION_SYSTEM_PROMPT,
   SUMMARY_SYSTEM_PROMPT,
@@ -49,18 +49,46 @@ function withDefaults(partial: Partial<SourceExtraction>): SourceExtraction {
   };
 }
 
+/**
+ * Two passes over the same source, merged into one extraction.
+ *
+ * The combined schema was rejected outright — "The compiled grammar is too
+ * large" — because ten arrays of provenance-bearing objects compile to more
+ * grammar than structured outputs will accept. Splitting it along entities and
+ * claims keeps each request comfortably inside that limit, and matches the rule
+ * this pipeline was built on: never one giant prompt.
+ *
+ * They run concurrently because neither depends on the other, so the split costs
+ * latency only in tokens, not in wall clock. If one pass fails and the other
+ * succeeds, the successful half is still written: half a source correctly
+ * extracted is worth more than nothing, and the missing half simply is not
+ * claimed. Only both failing counts as a failed extraction.
+ */
 export const extractWithClaude: ExtractionPort = async (source, principal) => {
-  const result = await completeStructured<Partial<SourceExtraction>>({
-    tier: "fast",
-    system: EXTRACTION_SYSTEM_PROMPT,
-    prompt: buildExtractionPrompt(source, principal),
-    schema: EXTRACTION_SCHEMA,
-    // A long transcript yields a lot of records; truncation here would silently
-    // drop commitments, so give it room.
-    maxTokens: 12_000,
-  });
+  const prompt = buildExtractionPrompt(source, principal);
 
-  return result === null ? null : withDefaults(result);
+  const [entities, claims] = await Promise.all([
+    completeStructured<Partial<SourceExtraction>>({
+      tier: "fast",
+      system: EXTRACTION_SYSTEM_PROMPT,
+      prompt,
+      schema: ENTITY_SCHEMA,
+      maxTokens: 8_000,
+    }),
+    completeStructured<Partial<SourceExtraction>>({
+      tier: "fast",
+      system: EXTRACTION_SYSTEM_PROMPT,
+      prompt,
+      schema: CLAIM_SCHEMA,
+      // A long transcript yields a lot of records; truncation here would silently
+      // drop commitments, so give it room.
+      maxTokens: 8_000,
+    }),
+  ]);
+
+  if (entities === null && claims === null) return null;
+
+  return withDefaults({ ...(entities ?? {}), ...(claims ?? {}) });
 };
 
 export const summariseWithClaude: SummaryPort = async (

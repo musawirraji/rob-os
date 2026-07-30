@@ -23,8 +23,11 @@ import {
  * The three-pane object record, shared by Person, Company and Project.
  *
  * The left panel stays visible because it is the answer to "who am I looking at",
- * and losing it while scrolling a feed is disorienting. Tabs are plain links with
- * a `?tab=` query, so the whole record is server-rendered and needs no client JS.
+ * and losing it while scrolling a feed is disorienting.
+ *
+ * Tabs still address a `?tab=` URL, so a panel stays linkable and server-rendered
+ * on first load — but the switching itself lives in `RecordTabs`, because each
+ * panel is a filter of state this page already holds.
  */
 
 // ── Left detail panel ────────────────────────────────────────────────────────
@@ -95,40 +98,9 @@ export function DetailPanel({
 }
 
 // ── Tabs ─────────────────────────────────────────────────────────────────────
+// The bar itself is rendered by `RecordTabs`; this is the shape it takes.
 
 export type ObjectTab = { id: string; label: string; count?: number };
-
-export function ObjectTabs({
-  tabs,
-  active,
-  basePath,
-}: {
-  tabs: ObjectTab[];
-  active: string;
-  basePath: string;
-}) {
-  return (
-    <nav className="ro-tabs" aria-label="Record sections">
-      {tabs.map((tab) => {
-        const isActive = tab.id === active;
-        return (
-          <Link
-            key={tab.id}
-            className={`ro-tabs__tab${isActive ? " is-active" : ""}`}
-            href={tab.id === "overview" ? basePath : `${basePath}?tab=${tab.id}`}
-            aria-current={isActive ? "page" : undefined}
-            scroll={false}
-          >
-            {tab.label}
-            {tab.count !== undefined && tab.count > 0 ? (
-              <span className="ro-tabs__count">{tab.count}</span>
-            ) : null}
-          </Link>
-        );
-      })}
-    </nav>
-  );
-}
 
 // ── Living summary ───────────────────────────────────────────────────────────
 
@@ -255,21 +227,29 @@ export function ActivityFeed({ entries }: { entries: FeedEntry[] }) {
 // ── Layout ───────────────────────────────────────────────────────────────────
 
 export function ObjectPage({
+  back,
   detail,
-  tabs,
   children,
 }: {
+  /** Where this record sits, so there is a way out that is not the browser button. */
+  back: { href: string; label: string };
   detail: ReactNode;
-  tabs: ReactNode;
+  /** The record body — in practice a `RecordTabs`, which owns the bar and panels. */
   children: ReactNode;
 }) {
   return (
     <div className="ro-object">
+      {/* A record is reachable from the brief, the palette and an answer's object
+          rail, not only from its own index — so the way back has to be stated
+          rather than assumed. It names the destination for the same reason: after
+          arriving from Ask, "back" alone does not say where to. */}
+      <Link className="ro-back" href={back.href}>
+        <Icon name="back" size={13} />
+        {back.label}
+      </Link>
+
       {detail}
-      <div className="ro-object__main">
-        {tabs}
-        <div className="ro-object__stack">{children}</div>
-      </div>
+      <div className="ro-object__main">{children}</div>
     </div>
   );
 }

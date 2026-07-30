@@ -1,6 +1,7 @@
 import { HugeiconsIcon } from "@hugeicons/react";
 import {
   AlertCircleIcon,
+  ArrowLeft02Icon,
   ArrowUp01Icon,
   Attachment01Icon,
   Briefcase01Icon,
@@ -41,6 +42,7 @@ const ICONS = {
   meeting: Calendar03Icon,
   ask: SparklesIcon,
   review: Queue01Icon,
+  back: ArrowLeft02Icon,
 
   // sources — these render inside the source chip
   email: Mail01Icon,

@@ -56,12 +56,16 @@ function NavList({ items, counts }: { items: NavItem[]; counts: ShellCounts }) {
               className={`ro-nav__item${active ? " is-active" : ""}`}
               href={item.href}
               aria-current={active ? "page" : undefined}
-              // Fetch the whole payload, not just the loading boundary. These eight
-              // routes are the app; warming them once after sign-in turns every
-              // click into a cache read instead of a round trip to another region.
-              // Paired with `staleTimes.static`, so it is warmed once rather than
-              // refetched on every render.
-              prefetch={true}
+              // Default prefetch, deliberately. `prefetch={true}` forces the full
+              // payload — but every route here is `force-dynamic`, so that payload
+              // is not cacheable, and the eight permanently-visible links re-fetched
+              // it on each router re-render. The result was a request storm: the
+              // same route pulled dozens of times a second while the page it was
+              // meant to speed up never settled.
+              //
+              // The default fetches the loading boundary, which is what actually
+              // makes a click feel instant — the skeleton appears immediately and
+              // the data streams in behind it.
             >
               <Icon name={item.icon} size={15} />
               <span className="ro-nav__label">{item.label}</span>

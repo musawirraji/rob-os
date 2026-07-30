@@ -3,6 +3,7 @@ import type { ReactNode } from "react";
 import Link from "next/link";
 
 import { APP_NAME } from "@shared/constants";
+import { routes } from "@shared/navigation/routes";
 
 import { Icon } from "./Icon";
 import { CommandPaletteTrigger } from "./CommandPaletteTrigger";
@@ -60,7 +61,11 @@ export function AppShell({
       <div className="ro-main">
         <header className="ro-topbar">
           <CommandPaletteTrigger />
-          <Link className="ro-btn ro-btn--primary" href="/inbox">
+          {/* Through the registry, like everything else. This is the one href the
+              shell renders twice — the sidebar has it too — and when the two
+              disagreed about prefetching they thrashed the same cache entry
+              between them, refetching the route without end. */}
+          <Link className="ro-btn ro-btn--primary" href={routes.inbox()}>
             <Icon name="capture" size={14} />
             Capture
           </Link>

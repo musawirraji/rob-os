@@ -13,13 +13,6 @@ export type ReviewState = {
 };
 
 /** Why this item needs a person, in the user's language rather than an enum. */
-const REASON_COPY: Record<Enums<"review_reason">, string> = {
-  low_confidence: "Not confident enough to file",
-  ambiguous_entity: "Could be more than one record",
-  conflicting_sources: "Sources disagree",
-  unparsed_date: "Could not read the date",
-  inference_needs_confirm: "Inferred — needs confirming",
-};
 
 function describe(entityKind: string, proposed: Record<string, unknown>): {
   headline: string;
@@ -107,4 +100,3 @@ export async function loadReviewScreen(
   return { items, pendingCount: items.length };
 }
 
-export { REASON_COPY };

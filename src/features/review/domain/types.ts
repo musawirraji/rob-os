@@ -45,3 +45,19 @@ export type ReviewOutcome = {
   /** True when the decision was stored as a hint for future resolution. */
   remembered: boolean;
 };
+
+/**
+ * Why this item needs a person, in the user's language rather than an enum.
+ *
+ * This lives in `domain` rather than beside the query that used to own it because
+ * it is pure copy with no I/O — and because the Review card is a client component.
+ * Re-exporting it from a `server-only` module pulled the entire ingestion service
+ * graph into the browser bundle and failed the build.
+ */
+export const REASON_COPY: Record<Enums<"review_reason">, string> = {
+  low_confidence: "Not confident enough to file",
+  ambiguous_entity: "Could be more than one record",
+  conflicting_sources: "Sources disagree",
+  unparsed_date: "Could not read the date",
+  inference_needs_confirm: "Inferred — needs confirming",
+};

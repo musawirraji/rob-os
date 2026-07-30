@@ -56,6 +56,12 @@ function NavList({ items, counts }: { items: NavItem[]; counts: ShellCounts }) {
               className={`ro-nav__item${active ? " is-active" : ""}`}
               href={item.href}
               aria-current={active ? "page" : undefined}
+              // Fetch the whole payload, not just the loading boundary. These eight
+              // routes are the app; warming them once after sign-in turns every
+              // click into a cache read instead of a round trip to another region.
+              // Paired with `staleTimes.static`, so it is warmed once rather than
+              // refetched on every render.
+              prefetch={true}
             >
               <Icon name={item.icon} size={15} />
               <span className="ro-nav__label">{item.label}</span>

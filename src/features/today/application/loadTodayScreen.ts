@@ -1,5 +1,7 @@
 import "server-only";
 
+import { after } from "next/server";
+
 import type { AdminClient } from "@shared/services/supabase/adminClient";
 import type { SourceKind } from "@shared/interfaces/objects";
 
@@ -10,7 +12,18 @@ import { loadBriefInputs, storeBrief } from "../services/briefRepository";
  * The single data call behind the Today screen. Screens stay render-only: this
  * returns finished view state, including the source chips each line needs, so the
  * component does no lookups and no formatting decisions of its own.
+ *
+ * **Persisting the brief does not block the render.** The screen is built from the
+ * in-memory draft, never from the stored copy, so awaiting three writes before
+ * returning made the page wait on work whose result it does not read. Against a
+ * hosted database — where a single round trip is a few hundred milliseconds — that
+ * was most of the two and a half seconds this screen took to appear.
+ *
+ * The cron job is the exception and passes `persist: "await"`. Its entire purpose
+ * is the write, so it must not report success before the write has happened.
  */
+
+export type PersistMode = "defer" | "await";
 
 export type TodaySourceChip = {
   sourceId: string;
@@ -43,17 +56,18 @@ export async function loadTodayScreen(
   db: AdminClient,
   workspaceId: string,
   now: Date = new Date(),
+  persist: PersistMode = "defer",
 ): Promise<TodayState | null> {
-  const { data: workspace } = await db
-    .from("workspace")
-    .select("principal_name")
-    .eq("id", workspaceId)
-    .single();
+  const today = now.toISOString().slice(0, 10);
+
+  // Independent queries, so they go together. Run in sequence these cost two full
+  // round trips to answer one screen.
+  const [{ data: workspace }, inputs] = await Promise.all([
+    db.from("workspace").select("principal_name").eq("id", workspaceId).single(),
+    loadBriefInputs(db, workspaceId),
+  ]);
 
   if (!workspace) return null;
-
-  const today = now.toISOString().slice(0, 10);
-  const inputs = await loadBriefInputs(db, workspaceId);
 
   const draft = buildBrief({
     today,
@@ -61,9 +75,22 @@ export async function loadTodayScreen(
     ...inputs,
   });
 
-  // Persist it. The screen reads a stored brief so a refresh is stable and
-  // `pg_cron` can regenerate it overnight without the page doing the work.
-  await storeBrief(db, workspaceId, today, draft);
+  // Persisted so a stored brief exists for `pg_cron` to refresh overnight and for
+  // anything else that wants yesterday's. Nothing below reads it back, so the
+  // response does not wait for it.
+  if (persist === "await") {
+    await storeBrief(db, workspaceId, today, draft);
+  } else {
+    after(async () => {
+      try {
+        await storeBrief(db, workspaceId, today, draft);
+      } catch (error) {
+        // The screen has already rendered correctly from the draft, so a failed
+        // write is a logging matter, not a user-facing one.
+        console.warn("[rob-os] deferred brief write failed:", error);
+      }
+    });
+  }
 
   // Resolve every referenced source once, so each line can render its chips.
   const sourceIds = [...new Set(draft.lines.flatMap((line) => line.sourceIds))];

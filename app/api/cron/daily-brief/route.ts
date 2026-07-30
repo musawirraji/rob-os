@@ -43,7 +43,9 @@ export async function POST(request: Request): Promise<NextResponse> {
   const results: { workspace: string; lines: number }[] = [];
 
   for (const workspace of workspaces ?? []) {
-    const state = await loadTodayScreen(db, workspace.id);
+    // "await": this job exists to write the brief, so it must not report success
+    // before the write has actually happened.
+    const state = await loadTodayScreen(db, workspace.id, new Date(), "await");
     results.push({ workspace: workspace.name, lines: state?.lines.length ?? 0 });
   }
 

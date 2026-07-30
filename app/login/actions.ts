@@ -20,10 +20,19 @@ import { getServerSupabase } from "@shared/services/supabase/serverClient";
 
 const EMAIL = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
-function backTo(next: string, message: string, ok: boolean): never {
-  redirect(
-    `/login?m=${encodeURIComponent(message)}&ok=${ok ? "1" : "0"}&next=${encodeURIComponent(next)}`,
-  );
+/**
+ * Failures travel back as a short code, never as prose.
+ *
+ * The earlier version put the message itself in the query string, which meant the
+ * sign-in page rendered whatever text the URL carried. That let a crafted link show
+ * an arbitrary message above a real password field — and it kept displaying copy
+ * from a removed feature long after the code that produced it was gone. A code the
+ * page has to recognise can only ever say one of the things below.
+ */
+export type LoginError = "invalid" | "rejected" | "unconfigured";
+
+function backTo(next: string, error: LoginError): never {
+  redirect(`/login?e=${error}&next=${encodeURIComponent(next)}`);
 }
 
 /** Same-origin only, so a crafted `next` cannot bounce a signed-in user offsite. */
@@ -37,12 +46,12 @@ export async function signInWithPassword(formData: FormData): Promise<void> {
   const next = String(formData.get("next") ?? "/");
 
   if (!EMAIL.test(email) || password.length === 0) {
-    backTo(next, "Enter both an email address and a password.", false);
+    backTo(next, "invalid");
   }
 
   const supabase = await getServerSupabase();
   if (!supabase) {
-    backTo(next, "Auth is not configured — set the Supabase environment variables.", false);
+    backTo(next, "unconfigured");
     return;
   }
 
@@ -50,9 +59,9 @@ export async function signInWithPassword(formData: FormData): Promise<void> {
 
   if (error) {
     console.warn("[rob-os] password sign-in failed:", error.message);
-    // One message for a wrong password and for an unknown address alike, so the
-    // form cannot be used to work out who has an account.
-    backTo(next, "Those details were not accepted.", false);
+    // One code for a wrong password and for an unknown address alike, so the form
+    // cannot be used to work out who has an account.
+    backTo(next, "rejected");
   }
 
   redirect(safePath(next));

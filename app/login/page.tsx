@@ -3,16 +3,31 @@ import { Icon } from "@shared/components/Icon";
 import { SubmitButton } from "@shared/components/SubmitButton";
 import { APP_NAME } from "@shared/constants";
 
-import { signInWithPassword } from "./actions";
+import { signInWithPassword, type LoginError } from "./actions";
 
 export const dynamic = "force-dynamic";
+
+/**
+ * The only messages this screen can show.
+ *
+ * The copy lives here rather than travelling in the URL, so a crafted link cannot
+ * put arbitrary words above a real password field — and a message from a removed
+ * feature cannot keep appearing because it is still sitting in someone's address
+ * bar. An unrecognised code shows nothing at all.
+ */
+const ERRORS: Record<LoginError, string> = {
+  invalid: "Enter both an email address and a password.",
+  rejected: "Those details were not accepted.",
+  unconfigured: "Auth is not configured — set the Supabase environment variables.",
+};
 
 export default async function Page({
   searchParams,
 }: {
-  searchParams: Promise<{ m?: string; ok?: string; next?: string }>;
+  searchParams: Promise<{ e?: string; next?: string }>;
 }) {
-  const { m, ok, next } = await searchParams;
+  const { e, next } = await searchParams;
+  const message = e && e in ERRORS ? ERRORS[e as LoginError] : null;
 
   return (
     <main className="ro-login">
@@ -53,9 +68,7 @@ export default async function Page({
           </BusyFields>
         </form>
 
-        {m ? (
-          <p className={`ro-login__flash${ok === "0" ? " is-error" : ""}`}>{m}</p>
-        ) : null}
+        {message ? <p className="ro-login__flash is-error">{message}</p> : null}
 
         <p className="ro-login__note">
           Accounts are not created here. If you have not been added to a workspace,

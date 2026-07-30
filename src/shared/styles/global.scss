@@ -850,6 +850,42 @@ a.ro-brief__row:hover {
   align-items: start;
 }
 
+// Spans the record grid so it sits above both panes rather than inside one, and
+// carries its own tighter gap — it belongs to the record, not to the columns.
+.ro-back {
+  grid-column: 1 / -1;
+  justify-self: start;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: -$ro-space-2;
+  padding: 4px 8px 4px 6px;
+  margin-left: -6px;
+  border-radius: var(--ro-radius-xs);
+  font-size: $ro-fs-xs;
+  color: var(--ro-ink-2);
+  transition:
+    background var(--ro-dur-fast) var(--ro-ease),
+    color var(--ro-dur-fast) var(--ro-ease);
+
+  svg {
+    flex: none;
+    color: var(--ro-muted);
+    transition: transform var(--ro-dur-fast) var(--ro-ease);
+  }
+
+  &:hover {
+    background: var(--ro-surface-3);
+    color: var(--ro-ink);
+
+    svg {
+      // A shift, not a slide — just enough to confirm the direction.
+      transform: translateX(-2px);
+      color: var(--ro-ink);
+    }
+  }
+}
+
 .ro-detail {
   background: var(--ro-surface);
   border: 1px solid var(--ro-line);
@@ -913,6 +949,13 @@ a.ro-brief__row:hover {
   gap: $ro-space-3;
   padding: $ro-space-3 0;
   border-bottom: 1px solid var(--ro-line-2);
+
+  // Every other repeating row in this sheet clears its last divider; this one was
+  // the exception, leaving a hairline under the final fact with nothing beneath it.
+  &:last-child {
+    border-bottom: 0;
+    padding-bottom: 0;
+  }
 
   dt {
     flex: none;
@@ -1670,6 +1713,30 @@ a.ro-brief__row:hover {
   width: 100%;
   margin-bottom: $ro-space-3;
   color: var(--ro-ink-2);
+
+  // The browser's own button is the one thing on this screen that belongs to no
+  // design system — grey bevel, wrong radius, wrong type. It cannot be replaced
+  // without giving up the native file picker, so it is restyled to match the
+  // secondary button instead.
+  &::file-selector-button {
+    margin: -7px $ro-space-3 -7px (-$ro-space-3);
+    padding: 7px $ro-space-3;
+    border: 0;
+    border-right: 1px solid var(--ro-line);
+    // Follows the field's own corner, inset by its 1px border, so the square
+    // edge cannot poke out past the rounded one.
+    border-radius: calc(var(--ro-radius-sm) - 1px) 0 0 calc(var(--ro-radius-sm) - 1px);
+    background: var(--ro-surface-3);
+    color: var(--ro-ink);
+    font: inherit;
+    font-weight: $ro-fw-medium;
+    cursor: pointer;
+    transition: background var(--ro-dur-fast) var(--ro-ease);
+  }
+
+  &:hover::file-selector-button {
+    background: rgba(23, 24, 26, 0.08);
+  }
 }
 
 .ro-capture__actions {
@@ -2287,16 +2354,22 @@ a.ro-brief__row:hover {
 // `BusyFields` uses a real <fieldset> so the browser disables the whole group
 // natively. It must therefore carry none of a fieldset's default chrome.
 
-.ro-fields {
+// Stripping a fieldset's default chrome is a *reset*, so it is wrapped in
+// `:where()` and carries zero specificity. Written plainly it was a single class
+// appearing late in the sheet, which silently beat every component class it was
+// combined with — `.ro-capture__form` sets its own padding, and this rule wiped
+// it out, leaving the capture inputs flush against the card edge. A reset should
+// never outrank the thing it is resetting for.
+:where(.ro-fields) {
   min-width: 0;
   margin: 0;
   padding: 0;
   border: 0;
+}
 
-  &.is-busy {
-    opacity: 0.6;
-    transition: opacity var(--ro-dur-base) var(--ro-ease);
-  }
+.ro-fields.is-busy {
+  opacity: 0.6;
+  transition: opacity var(--ro-dur-base) var(--ro-ease);
 }
 
 // The capture and login forms are laid out *by* the fieldset, so it inherits the

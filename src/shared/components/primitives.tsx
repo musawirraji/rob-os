@@ -1,5 +1,7 @@
 import type { ReactNode } from "react";
 
+import Link from "next/link";
+
 import type { SourceKind, StatusTone, TileColor } from "@shared/interfaces/objects";
 import type { ProvenanceLabel } from "@shared/interfaces/provenance";
 
@@ -90,9 +92,9 @@ export function SourceChip({
 
   if (href) {
     return (
-      <a className="ro-chip" href={href}>
+      <Link className="ro-chip" href={href}>
         {content}
-      </a>
+      </Link>
     );
   }
   return <span className="ro-chip">{content}</span>;

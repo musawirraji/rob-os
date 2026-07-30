@@ -1,3 +1,5 @@
+import Link from "next/link";
+
 import {
   Card,
   CardHeader,
@@ -53,9 +55,9 @@ function BriefRow({ line }: { line: TodayLine }) {
 
   if (line.href) {
     return (
-      <a className="ro-brief__row" href={line.href}>
+      <Link className="ro-brief__row" href={line.href}>
         {body}
-      </a>
+      </Link>
     );
   }
   return <div className="ro-brief__row">{body}</div>;

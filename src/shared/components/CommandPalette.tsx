@@ -2,6 +2,9 @@
 
 import { useEffect, useRef, useState } from "react";
 
+import Link from "next/link";
+import { useRouter } from "next/navigation";
+
 import type { SearchResponse } from "@features/search";
 
 import { Icon } from "./Icon";
@@ -14,8 +17,10 @@ import { ObjectTile } from "./primitives";
 export function CommandPalette({ onClose }: { onClose: () => void }) {
   const [query, setQuery] = useState("");
   const [results, setResults] = useState<SearchResponse | null>(null);
+  const [searching, setSearching] = useState(false);
   const [selected, setSelected] = useState(0);
   const inputRef = useRef<HTMLInputElement>(null);
+  const router = useRouter();
 
   useEffect(() => {
     inputRef.current?.focus();
@@ -24,23 +29,38 @@ export function CommandPalette({ onClose }: { onClose: () => void }) {
   useEffect(() => {
     if (query.trim().length < 2) {
       setResults(null);
+      setSearching(false);
       return;
     }
 
+    // The controller lives out here so the cleanup can actually reach it. Aborting
+    // matters more than it looks: without it a slow earlier request can resolve
+    // after a newer one and overwrite good results with stale ones.
+    const controller = new AbortController();
+    setSearching(true);
+
     // Debounced so typing does not fire a request per keystroke.
     const timer = setTimeout(() => {
-      const controller = new AbortController();
       fetch(`/api/search?q=${encodeURIComponent(query)}`, { signal: controller.signal })
         .then((response) => (response.ok ? response.json() : null))
         .then((data: SearchResponse | null) => {
           setResults(data);
           setSelected(0);
+          setSearching(false);
         })
-        .catch(() => setResults(null));
-      return () => controller.abort();
+        .catch(() => {
+          // An abort is the expected path when the query moved on, not a failure —
+          // leave the spinner up, because the newer request is still running.
+          if (controller.signal.aborted) return;
+          setResults(null);
+          setSearching(false);
+        });
     }, 140);
 
-    return () => clearTimeout(timer);
+    return () => {
+      clearTimeout(timer);
+      controller.abort();
+    };
   }, [query]);
 
   const flat = (results?.groups ?? []).flatMap((group) => group.hits);
@@ -56,7 +76,12 @@ export function CommandPalette({ onClose }: { onClose: () => void }) {
     }
     if (event.key === "Enter") {
       const hit = flat[selected];
-      if (hit) window.location.href = hit.href;
+      // router.push, not window.location — a full document load here would tear
+      // down the shell to go somewhere the client router can already reach.
+      if (hit) {
+        router.push(hit.href);
+        onClose();
+      }
     }
     if (event.key === "Escape") onClose();
   };
@@ -84,6 +109,11 @@ export function CommandPalette({ onClose }: { onClose: () => void }) {
             onChange={(event) => setQuery(event.target.value)}
             onKeyDown={onKeyDown}
           />
+          {/* Always rendered, so switching it on cannot shift the field. */}
+          <span
+            aria-hidden
+            className={`ro-spinner ro-palette__spinner${searching ? " is-busy" : ""}`}
+          />
         </div>
 
         {results && results.total > 0 ? (
@@ -95,12 +125,17 @@ export function CommandPalette({ onClose }: { onClose: () => void }) {
                 </p>
                 {group.hits.map((hit) => {
                   cursor += 1;
-                  const isSelected = cursor === selected;
+                  // Captured per row: `cursor` keeps moving during render, so a
+                  // closure over it would see the last index, not this one.
+                  const index = cursor;
+                  const isSelected = index === selected;
                   return (
-                    <a
+                    <Link
                       key={hit.id}
                       href={hit.href}
                       className={`ro-palette__row${isSelected ? " is-selected" : ""}`}
+                      onClick={onClose}
+                      onMouseEnter={() => setSelected(index)}
                     >
                       <ObjectTile color={hit.tile} size={22} />
                       <span className="ro-palette__name">{hit.name}</span>
@@ -108,7 +143,7 @@ export function CommandPalette({ onClose }: { onClose: () => void }) {
                         <span className="ro-palette__sub">{hit.subtitle}</span>
                       ) : null}
                       {isSelected ? <kbd className="ro-kbd">↵</kbd> : null}
-                    </a>
+                    </Link>
                   );
                 })}
               </div>

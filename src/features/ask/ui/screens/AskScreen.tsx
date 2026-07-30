@@ -1,3 +1,5 @@
+import Link from "next/link";
+
 import { Icon } from "@shared/components/Icon";
 import {
   Card,
@@ -8,6 +10,8 @@ import {
 } from "@shared/components/primitives";
 import { routes } from "@shared/navigation/routes";
 import type { AskAnswer } from "@features/ask";
+
+import { AskForm } from "../components/AskForm";
 
 /**
  * The Ask surface. Render-only.
@@ -40,23 +44,7 @@ export function AskScreen({ answer }: { answer: AskAnswer | null }) {
         </p>
       </header>
 
-      {/* A plain GET form: the question lives in the URL, so an answer is
-          linkable and survives a refresh. */}
-      <form className="ro-ask__form" action={routes.ask()} method="get">
-        <Icon name="search" size={16} />
-        <input
-          className="ro-ask__input"
-          type="text"
-          name="q"
-          defaultValue={answer?.question ?? ""}
-          placeholder="What did I promise Sarah this week?"
-          autoComplete="off"
-        />
-        <button className="ro-btn ro-btn--primary" type="submit">
-          <Icon name="send" size={14} />
-          Ask
-        </button>
-      </form>
+      <AskForm defaultValue={answer?.question ?? ""} />
 
       {answer === null ? (
         <div className="ro-ask__prompts">
@@ -69,7 +57,7 @@ export function AskScreen({ answer }: { answer: AskAnswer | null }) {
               "Which other vendors is Omnilux evaluating?",
             ].map((example) => (
               <li key={example}>
-                <a href={`${routes.ask()}?q=${encodeURIComponent(example)}`}>{example}</a>
+                <Link href={`${routes.ask()}?q=${encodeURIComponent(example)}`}>{example}</Link>
               </li>
             ))}
           </ul>
@@ -176,7 +164,7 @@ export function AskScreen({ answer }: { answer: AskAnswer | null }) {
                 <ul className="ro-ask__objects">
                   {answer.objects.map((object) => (
                     <li key={`${object.kind}-${object.id}`}>
-                      <a
+                      <Link
                         href={
                           object.kind === "person"
                             ? routes.person(object.id)
@@ -193,7 +181,7 @@ export function AskScreen({ answer }: { answer: AskAnswer | null }) {
                         {object.subtitle ? (
                           <span className="ro-ask__objectSub">{object.subtitle}</span>
                         ) : null}
-                      </a>
+                      </Link>
                     </li>
                   ))}
                 </ul>

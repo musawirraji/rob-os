@@ -1,5 +1,7 @@
 import type { ReactNode } from "react";
 
+import Link from "next/link";
+
 import type { FeedEntry } from "@shared/services/objectFeed";
 import { relativeAge } from "@shared/services/objectFeed";
 import type { ProvenanceLabel } from "@shared/interfaces/provenance";
@@ -61,7 +63,7 @@ export function DetailPanel({
       {actions && actions.length > 0 ? (
         <div className="ro-detail__actions">
           {actions.map((action) => (
-            <a
+            <Link
               key={action.label}
               className="ro-detail__action"
               href={action.href}
@@ -69,7 +71,7 @@ export function DetailPanel({
               title={action.label}
             >
               <Icon name={action.icon} size={14} />
-            </a>
+            </Link>
           ))}
         </div>
       ) : null}
@@ -110,17 +112,18 @@ export function ObjectTabs({
       {tabs.map((tab) => {
         const isActive = tab.id === active;
         return (
-          <a
+          <Link
             key={tab.id}
             className={`ro-tabs__tab${isActive ? " is-active" : ""}`}
             href={tab.id === "overview" ? basePath : `${basePath}?tab=${tab.id}`}
             aria-current={isActive ? "page" : undefined}
+            scroll={false}
           >
             {tab.label}
             {tab.count !== undefined && tab.count > 0 ? (
               <span className="ro-tabs__count">{tab.count}</span>
             ) : null}
-          </a>
+          </Link>
         );
       })}
     </nav>
@@ -303,7 +306,7 @@ export function ObjectList({
       ) : (
         <div className="ro-list">
           {rows.map((row) => (
-            <a key={row.id} className="ro-list__row" href={row.href}>
+            <Link key={row.id} className="ro-list__row" href={row.href}>
               <ObjectTile color={row.tile} size={26} />
               <span className="ro-list__body">
                 <span className="ro-list__name">{row.name}</span>
@@ -315,7 +318,7 @@ export function ObjectList({
                 <StatusBadge tone={row.badgeTone ?? "neutral"}>{row.badgeLabel}</StatusBadge>
               ) : null}
               {row.meta ? <span className="ro-list__meta">{row.meta}</span> : null}
-            </a>
+            </Link>
           ))}
         </div>
       )}

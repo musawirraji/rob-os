@@ -26,12 +26,17 @@ function check(label: string, passed: boolean, detail?: string): void {
 async function main(): Promise<void> {
   const [
     { getAdminSupabase },
-    { applyReviewDecision, loadReviewScreen },
+    { applyReviewDecision },
+    { loadReviewScreen },
     { ingestSource, parseFile },
     { revertAuditEntry, getAuditTrail },
   ] = await Promise.all([
     import("../src/shared/services/supabase/adminClient"),
-    import("../src/features/review"),
+    // Imported from the application module rather than the feature barrel: the
+    // barrel also re-exports the React screens, and those now reach `next/link`,
+    // which needs the client React runtime this script does not have.
+    import("../src/features/review/application/applyReviewDecision"),
+    import("../src/features/review/application/loadReviewScreen"),
     import("../src/features/ingestion"),
     import("../src/shared/services/auditRevert"),
   ]);

@@ -61,11 +61,22 @@ function check(label: string, passed: boolean, detail?: string): void {
 async function main(): Promise<void> {
   const [
     { getAdminSupabase },
-    { planQuery, retrieve, validateSynthesis, pruneUncitedSources, ask, synthesiseWithClaude },
+    { planQuery },
+    { retrieve },
+    { validateSynthesis, pruneUncitedSources },
+    { ask },
+    { synthesiseWithClaude },
     { isClaudeConfigured, isVoyageConfigured },
   ] = await Promise.all([
     import("../src/shared/services/supabase/adminClient"),
-    import("../src/features/ask"),
+    // Imported per module rather than through the feature barrel. The barrel also
+    // re-exports `AskScreen`, which reaches `next/link` and therefore the client
+    // React runtime — not something a headless script has.
+    import("../src/features/ask/domain/queryPlan"),
+    import("../src/features/ask/services/retrieval"),
+    import("../src/features/ask/domain/validateAnswer"),
+    import("../src/features/ask/application/ask"),
+    import("../src/features/ask/services/claudeSynthesis"),
     import("../src/shared/config/serverEnv"),
   ]);
 

@@ -54,8 +54,11 @@ npm run seed:ingest -- --fixtures
 npm run dev
 ```
 
-Sign in at `/login` as `rob@aisle3.io`. The magic link lands in Mailpit at
-<http://127.0.0.1:54424>.
+Sign in at `/login` as `rob@aisle3.io`. Sign-in is email and password only —
+set the password in Supabase under Authentication → Users. Sign-in links were
+removed: they are useless to anyone who does not control the mailbox they arrive
+at, and the built-in mailer silently drops messages past its hourly limit, so the
+failure is indistinguishable from a broken login.
 
 `--fixtures` replaces the two model calls with recorded output so the pipeline runs
 without API keys. Everything else — chunking, embedding writes, entity resolution,

@@ -1,7 +1,9 @@
+import { BusyFields } from "@shared/components/BusyFields";
 import { Icon } from "@shared/components/Icon";
+import { SubmitButton } from "@shared/components/SubmitButton";
 import { APP_NAME } from "@shared/constants";
 
-import { sendMagicLink, signInWithPassword } from "./actions";
+import { signInWithPassword } from "./actions";
 
 export const dynamic = "force-dynamic";
 
@@ -21,49 +23,34 @@ export default async function Page({
         <h1 className="ro-login__title">{APP_NAME}</h1>
         <p className="ro-login__sub">A private operating system for your work.</p>
 
-        {/* One form, two submit buttons. A magic link suits the owner; a password
-            is the only thing that works for someone who does not have access to
-            the mailbox the link would go to. */}
-        <form className="ro-login__form">
-          <input type="hidden" name="next" value={next ?? "/"} />
+        {/* Email and password only. Sign-in links were removed: they are useless
+            to a reviewer who does not control the mailbox they arrive at, and
+            keeping a second route that mostly fails is worse than not offering it.
+            Admin-generated links still resolve at /auth/callback. */}
+        <form action={signInWithPassword}>
+          <BusyFields className="ro-login__form">
+            <input type="hidden" name="next" value={next ?? "/"} />
 
-          <input
-            className="ro-login__input"
-            type="email"
-            name="email"
-            required
-            autoComplete="email"
-            placeholder="you@company.com"
-          />
+            <input
+              className="ro-login__input"
+              type="email"
+              name="email"
+              required
+              autoComplete="email"
+              placeholder="you@company.com"
+            />
 
-          <button
-            className="ro-btn ro-btn--primary"
-            type="submit"
-            formAction={sendMagicLink}
-          >
-            <Icon name="send" size={14} />
-            Email me a sign-in link
-          </button>
+            <input
+              className="ro-login__input"
+              type="password"
+              name="password"
+              required
+              autoComplete="current-password"
+              placeholder="Password"
+            />
 
-          <p className="ro-login__divider">
-            <span>or sign in with a password</span>
-          </p>
-
-          <input
-            className="ro-login__input"
-            type="password"
-            name="password"
-            autoComplete="current-password"
-            placeholder="Password"
-          />
-
-          <button
-            className="ro-btn ro-btn--secondary"
-            type="submit"
-            formAction={signInWithPassword}
-          >
-            Sign in
-          </button>
+            <SubmitButton busyLabel="Checking…">Sign in</SubmitButton>
+          </BusyFields>
         </form>
 
         {m ? (
@@ -72,7 +59,7 @@ export default async function Page({
 
         <p className="ro-login__note">
           Accounts are not created here. If you have not been added to a workspace,
-          neither route will let you in.
+          this form will not let you in.
         </p>
       </div>
     </main>

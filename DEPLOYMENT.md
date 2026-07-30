@@ -45,13 +45,15 @@ From Settings → API in Supabase:
 | `APP_URL` | `https://your-app.vercel.app` |
 | `CRON_SECRET` | any long random string you generate |
 
-`APP_URL` matters more than it looks: it is what the magic-link email points back at.
-Get it wrong and sign-in links go to the wrong host.
+`APP_URL` is the origin the app considers itself to live at, and what any
+admin-generated sign-in link is pointed back at. Get it wrong and those links
+resolve against the wrong host.
 
 ## 3. Auth redirect URLs
 
 Supabase compares redirect hosts **exactly**, so the Vercel domain has to be listed or
-sign-in links silently fall back to `site_url`. In Authentication → URL Configuration:
+admin-generated sign-in links silently fall back to `site_url`. In
+Authentication → URL Configuration:
 
 - **Site URL**: `https://your-app.vercel.app`
 - **Redirect URLs**: `https://your-app.vercel.app/**`
@@ -60,13 +62,14 @@ Add the preview domain too if you want sign-in to work on preview deployments.
 
 ## 4. Email
 
-The built-in Supabase email service is rate-limited (a few messages per hour) and is
-explicitly not meant for production. That is fine for one or two reviewers signing in
-occasionally, and **not** fine if several people try at once — the API returns success
-and quietly sends nothing, which looks exactly like a broken login.
+**Sign-in does not send email.** The login form is email and password only, so the
+Supabase mailer is not on the critical path and its rate limit cannot break a
+sign-in. This was a deliberate removal: the built-in service returns success and
+quietly sends nothing once past its hourly limit, which is indistinguishable from a
+broken login — and a link is worthless to a reviewer who does not own the mailbox.
 
-For anything beyond a demo, add custom SMTP under Authentication → Emails. Resend or
-Postmark both work and take about five minutes.
+Email is still needed if you later add password reset or invitations. At that point
+add custom SMTP under Authentication → Emails; Resend or Postmark take five minutes.
 
 ## 5. Load the corpus
 
@@ -115,20 +118,17 @@ whenever Today is opened, so nothing breaks, it just is not pre-warmed.
 
 ## Giving a reviewer access
 
-`shouldCreateUser: false` on the sign-in path means the login form **cannot create
-accounts**. Only people you add can get in, and an unknown address gets a deliberately
-vague failure rather than confirmation that it is not registered.
+The form only ever *verifies* a password — there is no sign-up path — so it
+**cannot create accounts**. Only people you add can get in, and a wrong password and
+an unknown address return the same deliberately vague message, so the form cannot be
+used to work out who has an account.
 
-### The mailbox problem
-
-A magic link is worthless to someone who does not control the inbox it goes to.
-Sending a reviewer a link addressed to `rob@aisle3.io` gives them nothing. There are
-three ways round it, in order of how well they suit a review.
+### Giving out access
 
 **1. A password on the demo account — recommended.**
 
-The login screen accepts a password as well as a link, precisely so access can be
-granted to an inbox you do not own. You set the password; the app only verifies one.
+This is the whole reason sign-in is password-based: access can be granted to a
+mailbox you do not own. You set the password; the app only verifies one.
 
 Authentication → Users → `rob@aisle3.io` → **Reset password** (or Add user with a
 password). Then send the reviewer the address and password. They sign in whenever they
@@ -137,7 +137,8 @@ signing in *as the workspace owner*.
 
 Use a throwaway password and rotate it after the review.
 
-**2. A one-off link you generate yourself.**
+**2. A one-off link you generate yourself.** Still supported — `/auth/callback`
+handles admin-generated links even though the login form no longer requests any.
 
 Authentication → Users → the user → **Generate link**, or:
 
